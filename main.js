@@ -52,7 +52,7 @@ babies.addEventListener('scroll', function(){
 function update_wealth_counter() {
   if (yale_viewable()) {
     if (yale_counter_viewable()) {
-      let wealth = (window.scrollX - yale.offsetLeft + 175) * 487805;
+      let wealth = (window.scrollX - yale.offsetLeft + 175) * 60976;
       yale_counter.innerHTML = (wealth < 40700000000) ? money.format(wealth) : "$40,700,000,000";
     }
     else {
