@@ -1,0 +1,73 @@
+var yale = document.getElementById('yale');
+var yale_counter = document.getElementById('yale-counter');
+var yaleCounterStart = document.getElementById('yale-counter-start');
+
+var babies = document.getElementById('babies-wrapper');
+var baby_counter = document.getElementById('baby-counter');
+
+var thousand = new Intl.NumberFormat('en-US')
+var money = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
+var additional_instructions_shown = false;
+
+function detect_confused_user(e, timer) {
+  if (!additional_instructions_shown) {
+    additional_instructions_shown = true;
+
+    setTimeout(function(){
+      if (window.scrollX < 1) {
+        document.getElementById('instructions').classList.add("show");
+      }
+    }, timer);
+  }
+}
+function detect_slightly_confused_user(e, timer) {
+  detect_confused_user(e, 2000);
+}
+function detect_very_confused_user(e, timer) {
+  detect_confused_user(e, 4500);
+}
+
+if (window.innerWidth > 450) {
+  document.addEventListener("mousemove", detect_very_confused_user, {once: true});
+  document.addEventListener("mousewheel", detect_slightly_confused_user, {once: true});
+  document.addEventListener("DOMMouseScroll", detect_slightly_confused_user, {once: true});
+}
+
+window.addEventListener('scroll', function(){
+  update_wealth_counter();
+});
+
+
+babies.addEventListener('scroll', function(){
+  let is_mobile = window.innerWidth <= 450;
+  let bg_size = (is_mobile) ? 68 : 160;
+  baby_counter.innerHTML = thousand.format(Math.floor(babies.scrollTop / bg_size * 5));
+})
+
+function update_wealth_counter() {
+  if (yale_viewable()) {
+    if (yale_counter_viewable()) {
+      let wealth = (window.scrollX - yale.offsetLeft + 175) * 500000;
+      yale_counter.innerHTML = (wealth < 40700000000) ? money.format(wealth) : "$40,700,000,000";
+    }
+    else {
+      yale_counter.innerHTML = '';
+    }
+  }
+  function yale_viewable() {
+    return window.scrollX < yale.offsetLeft + yale.offsetWidth + 100;
+  }
+  function yale_counter_viewable() {
+    return yaleCounterStart.offsetLeft - window.scrollX < (window.innerWidth);
+  }
+}
+function toggleZoom() {
+  document.getElementById('line-chart').classList.toggle('zoom');
+}
+
+
