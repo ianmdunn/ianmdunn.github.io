@@ -1,5 +1,7 @@
 try {
 
+  // Modern browser support - no complex fallbacks needed
+
   let yale = null;
   let yaleCounter = null;
   let yaleCounterStart = null;
@@ -14,6 +16,7 @@ const money = new Intl.NumberFormat('en-US', {
   minimumFractionDigits: 0,
   maximumFractionDigits: 0,
 });
+
 let additionalInstructionsShown = false;
 
 // Function to get Yale element with fallback
@@ -41,13 +44,18 @@ function getYaleCounterStart() {
   return yaleCounterStart;
 }
 
+// Modern browser event handling
+
 function detectConfusedUser(e, timer) {
   if (!additionalInstructionsShown) {
     additionalInstructionsShown = true;
 
     setTimeout(function(){
       if (window.scrollX < 1) {
-        document.getElementById('instructions').classList.add("show");
+        var instructions = document.getElementById('instructions');
+        if (instructions) {
+          instructions.className += " show";
+        }
       }
     }, timer);
   }
@@ -61,6 +69,7 @@ function detectVeryConfusedUser(e, timer) {
   detectConfusedUser(e, 4500);
 }
 
+// Modern event binding
 if (window.innerWidth > 450) {
   document.addEventListener("mousemove", detectVeryConfusedUser, {once: true});
   document.addEventListener("mousewheel", detectSlightlyConfusedUser, {once: true});
@@ -113,7 +122,6 @@ window.addEventListener('keydown', function(e) {
   }
 });
 
-
 if (babies && babyCounter) {
   babies.addEventListener('scroll', function(){
     const isMobile = window.innerWidth <= 450;
@@ -126,20 +134,20 @@ if (babies && babyCounter) {
 let previousScrollPosition = 0;
 
 function updateWealthCounter() {
-  const yaleElement = getYaleElement();
-  const yaleCounterElement = getYaleCounter();
-  const isMobile = window.innerWidth <= 450;
+  var yaleElement = getYaleElement();
+  var yaleCounterElement = getYaleCounter();
+  var isMobile = window.innerWidth <= 450;
 
   if (yaleElement && yaleCounterElement) {
     if (isMobile) {
       // Mobile: Use vertical scroll position
-      const yaleRect = yaleElement.getBoundingClientRect();
-      const yaleTop = yaleRect.top;
-      const viewportHeight = window.innerHeight;
+      var yaleRect = yaleElement.getBoundingClientRect();
+      var yaleTop = yaleRect.top;
+      var viewportHeight = window.innerHeight;
       
       // Show counter when the Yale element is visible in the viewport
-      const shouldShow = yaleTop <= viewportHeight && yaleTop >= -yaleElement.offsetHeight;
-      const wasVisible = yaleCounterElement.style.display === 'block';
+      var shouldShow = yaleTop <= viewportHeight && yaleTop >= -yaleElement.offsetHeight;
+      var wasVisible = yaleCounterElement.style.display === 'block';
       
       if (shouldShow && !wasVisible) {
         // Show counter
@@ -157,14 +165,14 @@ function updateWealthCounter() {
       // Always update the value when counter is visible
       if (shouldShow) {
         // Calculate progress based on vertical scroll through the Yale section
-        const yaleHeight = yaleElement.offsetHeight;
-        const scrollTop = window.pageYOffset;
-        const yaleOffsetTop = yaleElement.offsetTop;
-        const relativeScroll = scrollTop - yaleOffsetTop;
-        const progress = Math.max(0, Math.min(1, relativeScroll / yaleHeight));
+        var yaleHeight = yaleElement.offsetHeight;
+        var scrollTop = window.pageYOffset;
+        var yaleOffsetTop = yaleElement.offsetTop;
+        var relativeScroll = scrollTop - yaleOffsetTop;
+        var progress = Math.max(0, Math.min(1, relativeScroll / yaleHeight));
         
         // Calculate wealth: $0 at Yale start, $40.7B at Yale end
-        const wealth = progress * 40700000000;
+        var wealth = progress * 40700000000;
         yaleCounterElement.innerHTML = money.format(wealth);
         
         // Log when counter value changes significantly
@@ -175,12 +183,12 @@ function updateWealthCounter() {
       }
     } else {
       // Desktop: Use horizontal scroll position (original logic)
-      const yaleRect = yaleElement.getBoundingClientRect();
-      const yaleLeft = yaleRect.left;
+      var yaleRect = yaleElement.getBoundingClientRect();
+      var yaleLeft = yaleRect.left;
       
       // Show counter when the Yale element is at or past the left edge of the viewport
-      const shouldShow = yaleLeft <= 0;
-      const wasVisible = yaleCounterElement.style.display === 'block';
+      var shouldShow = yaleLeft <= 0;
+      var wasVisible = yaleCounterElement.style.display === 'block';
       
       if (shouldShow && !wasVisible) {
         // Show counter
@@ -200,11 +208,11 @@ function updateWealthCounter() {
         // Calculate wealth based on how much of the Yale element has passed the left edge
         // When yaleLeft is 0, we're at the start (should be $0)
         // When yaleLeft is -yaleWidth, we're at the end (should be $40.7B)
-        const yaleWidth = yaleElement.offsetWidth;
-        const progress = Math.max(0, Math.min(1, -yaleLeft / yaleWidth));
+        var yaleWidth = yaleElement.offsetWidth;
+        var progress = Math.max(0, Math.min(1, -yaleLeft / yaleWidth));
         
         // Calculate wealth: $0 at Yale start, $40.7B at Yale end
-        const wealth = progress * 40700000000;
+        var wealth = progress * 40700000000;
         yaleCounterElement.innerHTML = money.format(wealth);
         
         // Log when counter value changes significantly
@@ -229,16 +237,16 @@ function toggleZoom() {
 
 // ===== YALE ENDOWMENT GROWTH CALCULATOR =====
 // Yale's endowment data
-const YALE_ENDOWMENT_BASE = 40700000000; // $40.7 billion
-const YALE_AVERAGE_ANNUAL_RETURN = 0.08; // 8% average annual return over 5 years
+var YALE_ENDOWMENT_BASE = 40700000000; // $40.7 billion
+var YALE_AVERAGE_ANNUAL_RETURN = 0.08; // 8% average annual return over 5 years
 
 // Growth pixel area elements
-const growthPixelArea = document.getElementById('growth-pixel-area');
-const growthCounter = document.getElementById('growth-counter');
-const growthRate = document.getElementById('growth-rate');
+var growthPixelArea = document.getElementById('growth-pixel-area');
+var growthCounter = document.getElementById('growth-counter');
+var growthRate = document.getElementById('growth-rate');
 
 // Track when the page was loaded
-let pageLoadTime = null;
+var pageLoadTime = null;
 
 function calculateYaleGrowth() {
   if (!growthPixelArea || !growthCounter || !growthRate) {
@@ -274,40 +282,39 @@ function calculateYaleGrowth() {
 }
 
 // Track total pixels added
-let totalPixelsAdded = 0;
+var totalPixelsAdded = 0;
 
 // Function to add growth pixels
 function addGrowthPixels(pixelsToAdd) {
   if (!growthPixelArea) return;
   
   // Calculate how many new pixels to add
-  const newPixelsToAdd = pixelsToAdd - totalPixelsAdded;
+  var newPixelsToAdd = pixelsToAdd - totalPixelsAdded;
   
   if (newPixelsToAdd > 0) {
     // Add new pixels with staggered timing
-    for (let i = 0; i < newPixelsToAdd; i++) {
-      setTimeout(() => {
-        const pixel = document.createElement('div');
+    for (var i = 0; i < newPixelsToAdd; i++) {
+      setTimeout(function() {
+        var pixel = document.createElement('div');
         pixel.className = 'growth-pixel';
         // Create a color palette for variety
-        const colors = ['#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ff9800'];
-        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        var colors = ['#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ff9800'];
+        var randomColor = colors[Math.floor(Math.random() * colors.length)];
         
-        pixel.style.cssText = `
-          position: absolute;
-          width: 2px;
-          height: 2px;
-          background-color: ${randomColor};
-          left: ${Math.random() * 100}%;
-          top: -10px;
-          z-index: 1;
-          border-radius: 1px;
-        `;
+        pixel.style.cssText = 
+          'position: absolute;' +
+          'width: 2px;' +
+          'height: 2px;' +
+          'background-color: ' + randomColor + ';' +
+          'left: ' + (Math.random() * 100) + '%;' +
+          'top: -10px;' +
+          'z-index: 1;' +
+          'border-radius: 1px;';
         growthPixelArea.appendChild(pixel);
         
         // Trigger the drop animation
-        setTimeout(() => {
-          pixel.style.top = `${Math.random() * 100}%`;
+        setTimeout(function() {
+          pixel.style.top = (Math.random() * 100) + '%';
         }, 50);
       }, i * 100); // Stagger each pixel by 100ms
     }
@@ -1067,4 +1074,24 @@ window.addEventListener('resize', function() {
 
 } catch (error) {
   console.error('=== JAVASCRIPT ERROR ===', error);
+  
+  // Show user-friendly error message
+  var errorDiv = document.createElement('div');
+  errorDiv.style.cssText = 
+    'position: fixed;' +
+    'top: 50%;' +
+    'left: 50%;' +
+    'transform: translate(-50%, -50%);' +
+    'background: rgba(220, 53, 69, 0.9);' +
+    'color: white;' +
+    'padding: 20px;' +
+    'border-radius: 10px;' +
+    'text-align: center;' +
+    'z-index: 10000;' +
+    'max-width: 400px;';
+  errorDiv.innerHTML = 
+    '<h3>Something went wrong</h3>' +
+    '<p>There was an error loading this page. Please try refreshing or using a different browser.</p>' +
+    '<button onclick="location.reload()" style="margin-top: 10px; padding: 5px 15px; border: none; background: white; color: #dc3545; border-radius: 5px; cursor: pointer;">Refresh Page</button>';
+  document.body.appendChild(errorDiv);
 }
