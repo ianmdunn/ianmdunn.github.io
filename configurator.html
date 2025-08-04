@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+  
+  <title>Yale Endowment Configurator</title>
+  <meta name="description" content="Build and configure infoboxes for the Yale Endowment visualization">
+  
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic,700italic|Raleway:800,300,100,600" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="main.css">
+  <style>
+    /* Configurator-specific styles */
+    .configurator-container {
+      display: flex;
+      height: 100vh;
+      font-family: 'Source Sans Pro', sans-serif;
+      isolation: isolate;
+      contain: layout style paint;
+    }
+
+    .sidebar {
+      width: 50%;
+      background: #f8f9fa;
+      border-right: 1px solid #dee2e6;
+      padding: 20px;
+      overflow-y: auto;
+      writing-mode: horizontal-tb !important;
+      text-orientation: mixed !important;
+      direction: ltr !important;
+      text-align: left !important;
+    }
+
+    .sidebar * {
+      writing-mode: horizontal-tb !important;
+      text-orientation: mixed !important;
+      direction: ltr !important;
+      transform: none !important;
+      white-space: normal !important;
+      word-wrap: break-word !important;
+      overflow-wrap: break-word !important;
+    }
+
+    .sidebar h2,
+    .sidebar h3,
+    .sidebar p,
+    .sidebar label,
+    .sidebar input,
+    .sidebar textarea,
+    .sidebar select,
+    .sidebar button,
+    .sidebar div {
+      display: block !important;
+      width: auto !important;
+      height: auto !important;
+      min-height: auto !important;
+      max-height: none !important;
+      transform: none !important;
+      writing-mode: horizontal-tb !important;
+      text-orientation: mixed !important;
+      direction: ltr !important;
+      text-align: left !important;
+      vertical-align: baseline !important;
+      min-width: 300px !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    /* Ensure form controls are properly sized */
+    .sidebar .form-control {
+      width: 100% !important;
+      min-width: 300px !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    /* Ensure buttons are properly sized */
+    .sidebar .btn {
+      width: auto !important;
+      min-width: 80px !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    .main-content {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .toolbar {
+      background: #fff;
+      border-bottom: 1px solid #dee2e6;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .preview-area {
+      flex: 1;
+      background: #fff;
+      overflow: auto;
+      position: relative;
+      overflow-x: auto;
+      overflow-y: auto;
+      min-width: 800px;
+      scroll-behavior: smooth;
+    }
+
+    .config-section {
+      margin-bottom: 25px;
+    }
+
+    .config-section h3 {
+      margin: 0 0 15px 0;
+      color: #333;
+      font-size: 16px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: visible;
+      text-overflow: clip;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #555;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: visible;
+      text-overflow: clip;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #ba0c2f;
+      box-shadow: 0 0 0 2px rgba(186, 12, 47, 0.2);
+    }
+
+    textarea.form-control {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #ba0c2f;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #a00a28;
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #218838;
+    }
+
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c82333;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .infobox-list {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: white;
+    }
+
+    .infobox-item {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .infobox-item:hover {
+      background: #f8f9fa;
+    }
+
+    .infobox-item.selected {
+      background: #e3f2fd;
+      border-left: 3px solid #2196f3;
+    }
+
+    .infobox-item .title {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .infobox-item .type {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .preview-container {
+      min-height: 600px;
+      min-width: 1200px;
+      background: linear-gradient(90deg, #f8f9fa 0%, #e9ecef 100%);
+      position: relative;
+      padding: 20px;
+    }
+
+    .overview-preview {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 300px;
+      height: 200px;
+      background: white;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .overview-preview:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+
+    .overview-preview.minimized {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+    }
+
+    .overview-preview.minimized .overview-content {
+      display: none;
+    }
+
+    .overview-header {
+      background: #ba0c2f;
+      color: white;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .overview-header .minimize-btn {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 0;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .overview-content {
+      padding: 10px;
+      height: calc(100% - 40px);
+      overflow: hidden;
+    }
+
+    .overview-timeline {
+      width: 100%;
+      height: 20px;
+      background: #ba0c2f;
+      position: relative;
+      margin-bottom: 10px;
+      border-radius: 2px;
+    }
+
+    .overview-infobox {
+      position: absolute;
+      width: 4px;
+      height: 12px;
+      background: #ff6900;
+      border-radius: 2px;
+      top: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .overview-infobox:hover {
+      background: #e55a00;
+      transform: scale(1.2);
+    }
+
+    .overview-infobox.selected {
+      background: #286dc0;
+      box-shadow: 0 0 0 2px rgba(40, 109, 192, 0.3);
+    }
+
+    .overview-stats {
+      font-size: 11px;
+      color: #666;
+      line-height: 1.3;
+    }
+
+    .overview-stats .stat {
+      margin-bottom: 4px;
+    }
+
+    .yale-ruler-preview {
+      width: 101750px;
+      height: 400px;
+      background: #ba0c2f;
+      position: relative;
+      margin-bottom: 20px;
+      border-radius: 4px;
+      margin-left: 0;
+    }
+
+    .infobox-preview {
+      position: absolute;
+      background: white;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      max-width: 300px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      cursor: move;
+    }
+
+    .infobox-preview.selected {
+      border-color: #ba0c2f;
+      box-shadow: 0 0 0 2px rgba(186, 12, 47, 0.3);
+    }
+
+    .infobox-preview .title {
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .infobox-preview .content {
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .export-section {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 4px;
+      margin-top: 20px;
+    }
+
+    .export-section textarea {
+      width: 100%;
+      min-height: 100px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    .status-bar {
+      background: #e9ecef;
+      padding: 10px 20px;
+      border-top: 1px solid #dee2e6;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .drag-handle {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 20px;
+      height: 20px;
+      background: #ddd;
+      border-radius: 50%;
+      cursor: move;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 5px;
+      right: 30px;
+      width: 20px;
+      height: 20px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="configurator-container">
+    <div class="sidebar">
+      <h2 style="margin: 0 0 25px 0; color: #ba0c2f; font-size: 20px; line-height: 1.3;">Yale Endowment Configurator</h2>
+      
+      <!-- Instructions -->
+      <div class="config-section" style="background: #e3f2fd; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+        <h3 style="margin: 0 0 10px 0; color: #1976d2;">How to Use</h3>
+        <div style="font-size: 13px; line-height: 1.4; color: #333;">
+          <p><strong>1.</strong> Use the form below to create new infoboxes</p>
+          <p><strong>2.</strong> Drag infoboxes in the preview area to position them</p>
+          <p><strong>3.</strong> Edit existing infoboxes by selecting them from the list</p>
+          <p><strong>4.</strong> Click "Apply to Main Page" to generate the updated visualization</p>
+        </div>
+      </div>
+      
+      <!-- Infobox Configuration -->
+      <div class="config-section">
+        <h3>Infobox Configuration</h3>
+        
+        <div class="form-group">
+          <label for="infobox-title">Title</label>
+          <input type="text" id="infobox-title" class="form-control" placeholder="Enter infobox title">
+        </div>
+        
+        <div class="form-group">
+          <label for="infobox-content">Content</label>
+          <textarea id="infobox-content" class="form-control" placeholder="Enter infobox content (supports HTML)"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="infobox-type">Type</label>
+          <select id="infobox-type" class="form-control">
+            <option value="text">Text Only</option>
+            <option value="block">Text with Visual Block</option>
+            <option value="square">Text with Square Block</option>
+          </select>
+        </div>
+        
+        <div class="btn-group">
+          <button class="btn btn-primary" id="add-infobox">Add Infobox</button>
+          <button class="btn btn-secondary" id="update-infobox" style="display: none;">Update</button>
+        </div>
+      </div>
+      
+      <!-- Infobox Management -->
+      <div class="config-section">
+        <h3>Manage Infoboxes</h3>
+        <div class="infobox-list" id="infobox-list">
+          <!-- Infoboxes will be listed here -->
+        </div>
+        <div style="margin-top: 10px;">
+          <button class="btn btn-danger" id="delete-selected">Delete Selected</button>
+        </div>
+      </div>
+      
+
+      
+      <!-- Export Section -->
+      <div class="export-section">
+        <h3>Export Configuration</h3>
+        <button class="btn btn-success" id="export-html">Export HTML</button>
+        <button class="btn btn-success" id="export-css">Export CSS</button>
+        <button class="btn btn-primary" id="apply-to-main">Apply to Main Page</button>
+        <textarea id="export-output" placeholder="Exported code will appear here..." readonly></textarea>
+      </div>
+    </div>
+    
+    <div class="main-content">
+      <div class="toolbar">
+        <button class="btn btn-secondary" id="preview-mode">Preview Mode</button>
+        <button class="btn btn-secondary" id="edit-mode">Edit Mode</button>
+        <button class="btn btn-secondary" id="clear-all">Clear All</button>
+        <span style="margin-left: auto; font-size: 14px; color: #666; font-weight: 500;">
+          <span id="infobox-count">0</span> infoboxes created
+        </span>
+      </div>
+      
+      <div class="preview-area">
+        <div class="preview-container" id="preview-container">
+          <div class="yale-ruler-preview">
+            <div style="position: absolute; top: 10px; left: 10px; color: white; font-weight: 600;">
+              Yale Endowment: $40.7 billion
+            </div>
+            <div style="position: absolute; top: 10px; right: 10px; color: white; font-size: 12px;">
+              Scale: 1 pixel = $1,000
+            </div>
+          </div>
+          <!-- Infoboxes will be placed here -->
+        </div>
+      </div>
+      
+      <div class="status-bar">
+        <span id="status-message">Start by creating your first infobox using the form above</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    class InfoboxConfigurator {
+      constructor() {
+        this.infoboxes = [];
+        this.selectedInfobox = null;
+        this.isEditMode = false;
+        this.isDragging = false;
+        this.dragTarget = null;
+        
+        this.initializeEventListeners();
+        this.updateInfoboxCount();
+        this.showStatus('Start by creating your first infobox using the form above');
+      }
+      
+      initializeEventListeners() {
+        // Form controls
+        document.getElementById('add-infobox').addEventListener('click', () => {
+          this.addInfobox();
+        });
+        
+        document.getElementById('update-infobox').addEventListener('click', () => {
+          this.updateInfobox();
+        });
+        
+        document.getElementById('delete-selected').addEventListener('click', () => {
+          this.deleteSelectedInfobox();
+        });
+        
+        // Toolbar buttons
+        document.getElementById('preview-mode').addEventListener('click', () => {
+          this.setPreviewMode();
+        });
+        
+        document.getElementById('edit-mode').addEventListener('click', () => {
+          this.setEditMode();
+        });
+        
+        document.getElementById('clear-all').addEventListener('click', () => {
+          this.clearAll();
+        });
+        
+        // Export buttons
+        document.getElementById('export-html').addEventListener('click', () => {
+          this.exportHTML();
+        });
+        
+        document.getElementById('export-css').addEventListener('click', () => {
+          this.exportCSS();
+        });
+        
+        document.getElementById('apply-to-main').addEventListener('click', () => {
+          this.applyToMainPage();
+        });
+        
+        // Preview area events
+        const previewContainer = document.getElementById('preview-container');
+        previewContainer.addEventListener('mousedown', (e) => {
+          if (this.isEditMode && e.target.classList.contains('infobox-preview')) {
+            this.startDrag(e);
+          }
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+          if (this.isDragging && this.dragTarget) {
+            this.handleDrag(e);
+          }
+        });
+        
+        document.addEventListener('mouseup', () => {
+          if (this.isDragging) {
+            this.stopDrag();
+          }
+        });
+      }
+      
+      addInfobox() {
+        const title = document.getElementById('infobox-title').value.trim();
+        const content = document.getElementById('infobox-content').value.trim();
+        const type = document.getElementById('infobox-type').value;
+        
+        if (!title || !content) {
+          this.showStatus('Please fill in both title and content', 'error');
+          return;
+        }
+        
+        const infobox = {
+          id: Date.now(),
+          title: title,
+          content: content,
+          type: type,
+          position: { x: 50, y: 50 },
+          class: `infobox-${this.infoboxes.length + 1}`
+        };
+        
+        this.infoboxes.push(infobox);
+        this.renderInfobox(infobox);
+        this.updateInfoboxList();
+        this.updateInfoboxCount();
+        this.clearForm();
+        this.showStatus(`Infobox "${title}" added successfully`);
+      }
+      
+      updateInfobox() {
+        if (!this.selectedInfobox) return;
+        
+        const title = document.getElementById('infobox-title').value.trim();
+        const content = document.getElementById('infobox-content').value.trim();
+        const type = document.getElementById('infobox-type').value;
+        
+        if (!title || !content) {
+          this.showStatus('Please fill in both title and content', 'error');
+          return;
+        }
+        
+        this.selectedInfobox.title = title;
+        this.selectedInfobox.content = content;
+        this.selectedInfobox.type = type;
+        
+        this.updateInfoboxDisplay(this.selectedInfobox);
+        this.updateInfoboxList();
+        this.clearForm();
+        this.showStatus(`Infobox "${title}" updated successfully`);
+        this.selectedInfobox = null;
+        document.getElementById('update-infobox').style.display = 'none';
+        document.getElementById('add-infobox').style.display = 'inline-block';
+      }
+      
+      renderInfobox(infobox) {
+        const previewContainer = document.getElementById('preview-container');
+        const infoboxElement = document.createElement('div');
+        infoboxElement.className = 'infobox-preview';
+        infoboxElement.id = `infobox-${infobox.id}`;
+        infoboxElement.style.left = `${infobox.position.x}px`;
+        infoboxElement.style.top = `${infobox.position.y}px`;
+        
+        let content = `
+          <div class="drag-handle">⋮</div>
+          <button class="delete-btn" onclick="configurator.deleteInfobox(${infobox.id})">×</button>
+          <div class="title">${infobox.title}</div>
+          <div class="content">${infobox.content}</div>
+        `;
+        
+        infoboxElement.innerHTML = content;
+        previewContainer.appendChild(infoboxElement);
+      }
+      
+      updateInfoboxDisplay(infobox) {
+        const element = document.getElementById(`infobox-${infobox.id}`);
+        if (element) {
+          element.querySelector('.title').textContent = infobox.title;
+          element.querySelector('.content').innerHTML = infobox.content;
+        }
+      }
+      
+      updateInfoboxList() {
+        const list = document.getElementById('infobox-list');
+        list.innerHTML = '';
+        
+        this.infoboxes.forEach(infobox => {
+          const item = document.createElement('div');
+          item.className = 'infobox-item';
+          item.onclick = () => this.selectInfobox(infobox);
+          
+          item.innerHTML = `
+            <div class="title">${infobox.title}</div>
+            <div class="type">${infobox.type}</div>
+          `;
+          
+          list.appendChild(item);
+        });
+      }
+      
+      selectInfobox(infobox) {
+        this.selectedInfobox = infobox;
+        
+        // Update form
+        document.getElementById('infobox-title').value = infobox.title;
+        document.getElementById('infobox-content').value = infobox.content;
+        document.getElementById('infobox-type').value = infobox.type;
+        
+        // Update buttons
+        document.getElementById('add-infobox').style.display = 'none';
+        document.getElementById('update-infobox').style.display = 'inline-block';
+        
+        // Highlight in preview
+        document.querySelectorAll('.infobox-preview').forEach(el => el.classList.remove('selected'));
+        document.getElementById(`infobox-${infobox.id}`).classList.add('selected');
+        
+        this.showStatus(`Selected infobox: "${infobox.title}"`);
+      }
+      
+      deleteInfobox(id) {
+        const index = this.infoboxes.findIndex(infobox => infobox.id === id);
+        if (index > -1) {
+          this.infoboxes.splice(index, 1);
+          const element = document.getElementById(`infobox-${id}`);
+          if (element) element.remove();
+          this.updateInfoboxList();
+          this.updateInfoboxCount();
+          this.showStatus('Infobox deleted');
+        }
+      }
+      
+      deleteSelectedInfobox() {
+        if (this.selectedInfobox) {
+          this.deleteInfobox(this.selectedInfobox.id);
+          this.selectedInfobox = null;
+          this.clearForm();
+          document.getElementById('update-infobox').style.display = 'none';
+          document.getElementById('add-infobox').style.display = 'inline-block';
+        }
+      }
+      
+      clearForm() {
+        document.getElementById('infobox-title').value = '';
+        document.getElementById('infobox-content').value = '';
+        document.getElementById('infobox-type').value = 'text';
+      }
+      
+      setPreviewMode() {
+        this.isEditMode = false;
+        document.querySelectorAll('.infobox-preview').forEach(el => {
+          el.style.cursor = 'default';
+          el.querySelector('.drag-handle').style.display = 'none';
+          el.querySelector('.delete-btn').style.display = 'none';
+        });
+        this.showStatus('Preview mode - infoboxes are locked');
+      }
+      
+      setEditMode() {
+        this.isEditMode = true;
+        document.querySelectorAll('.infobox-preview').forEach(el => {
+          el.style.cursor = 'move';
+          el.querySelector('.drag-handle').style.display = 'flex';
+          el.querySelector('.delete-btn').style.display = 'flex';
+        });
+        this.showStatus('Edit mode - you can drag and delete infoboxes');
+      }
+      
+      startDrag(e) {
+        this.isDragging = true;
+        this.dragTarget = e.target;
+        e.preventDefault();
+      }
+      
+      handleDrag(e) {
+        if (!this.dragTarget) return;
+        
+        const rect = document.getElementById('preview-container').getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        this.dragTarget.style.left = `${Math.max(0, x)}px`;
+        this.dragTarget.style.top = `${Math.max(0, y)}px`;
+        
+        // Update position in data
+        const id = parseInt(this.dragTarget.id.replace('infobox-', ''));
+        const infobox = this.infoboxes.find(inf => inf.id === id);
+        if (infobox) {
+          infobox.position = { x: Math.max(0, x), y: Math.max(0, y) };
+        }
+      }
+      
+      stopDrag() {
+        this.isDragging = false;
+        this.dragTarget = null;
+      }
+      
+      clearAll() {
+        if (confirm('Are you sure you want to clear all infoboxes?')) {
+          this.infoboxes = [];
+          document.getElementById('preview-container').querySelectorAll('.infobox-preview').forEach(el => el.remove());
+          this.updateInfoboxList();
+          this.updateInfoboxCount();
+          this.clearForm();
+          this.showStatus('All infoboxes cleared');
+        }
+      }
+      
+      exportHTML() {
+        let html = '';
+        this.infoboxes.forEach(infobox => {
+          html += `\n          <div class="infobox ${infobox.class} infobox-${infobox.type}">\n`;
+          html += `            <div class="title">${infobox.title}</div>\n`;
+          html += `            <div class="content">${infobox.content}</div>\n`;
+          html += `          </div>\n`;
+        });
+        
+        document.getElementById('export-output').value = html;
+        this.showStatus('HTML exported to text area');
+      }
+      
+      exportCSS() {
+        let css = '';
+        this.infoboxes.forEach(infobox => {
+          css += `\n.yale .infobox.${infobox.class} {\n`;
+          css += `  left: ${infobox.position.x}px;\n`;
+          css += `  top: ${infobox.position.y}px;\n`;
+          css += `}\n`;
+        });
+        
+        document.getElementById('export-output').value = css;
+        this.showStatus('CSS exported to text area');
+      }
+      
+      applyToMainPage() {
+        // Generate the HTML content for all infoboxes
+        let htmlContent = '';
+        this.infoboxes.forEach(infobox => {
+          htmlContent += `\n          <div class="infobox ${infobox.class} infobox-${infobox.type}">\n`;
+          htmlContent += `            <div class="title">${infobox.title}</div>\n`;
+          htmlContent += `            <div class="content">${infobox.content}</div>\n`;
+          htmlContent += `          </div>\n`;
+        });
+        
+        // Generate CSS for positioning
+        let cssContent = '';
+        this.infoboxes.forEach(infobox => {
+          cssContent += `\n.yale .infobox.${infobox.class} {\n`;
+          cssContent += `  left: ${infobox.position.x}px;\n`;
+          cssContent += `  top: ${infobox.position.y}px;\n`;
+          cssContent += `}\n`;
+        });
+        
+        // Create a new window with the updated index.html
+        const newWindow = window.open('', '_blank');
+        newWindow.document.write(`
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+            
+            <title>Yale Endowment, shown to scale</title>
+            <meta name="description" content="Yale University's endowment is enormous. Here we visualize its scale in a unique way.">
+            
+            <meta property="og:title" content="Yale Endowment, shown to scale">
+            <meta property="og:type" content="website">
+            <meta property="og:description" content="Yale University's endowment is enormous. Here we visualize its scale in a unique way.">
+            
+            <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic,700italic|Raleway:800,300,100,600" rel="stylesheet">
+            <link rel="stylesheet" type="text/css" href="main.css">
+            <style>
+              ${cssContent}
+            </style>
+          </head>
+          <body>
+            <div class="wealth-wrapper-outer">
+              <div class="wealth-row wealth-row-one">
+                <div class="title-screen">
+                  <h1>Yale Endowment, shown to scale</h1>
+                  <div class="scroll-this-way">
+                    <span class="desktop-scroll">scroll right</span>
+                    <span class="mobile-scroll">scroll down</span>
+                    <div id="instructions" class="instructions show">To scroll right, use shift + mousewheel. If you have a touchpad, swipe sideways.</div>
+                  </div>
+                </div>
+                <div class="wealth-wrapper">
+                  <div class="wealth one-thousand"></div>
+                  <h2 class="wealth-title">$1,000</h2>
+                  <div class="arrow">
+                    <svg viewBox="668 -8 14 70" width="14" height="70">
+                      <path d="M 676.4207 61.25 L 673.2793 61.25 L 673.2793 6.822266 L 668.6 6.822266 L 674.85 -7.8 L 681.1 6.822266 L 676.4207 6.822266 Z" fill="#ccc"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="wealth-wrapper">
+                  <div class="wealth median-wage"></div>
+                  <h2 class="wealth-title">$72,000 <span class="explainer">(Average Yale worker salary)</span></h2>
+                </div>
+                <div class="wealth-wrapper">
+                  <div class="wealth million"></div>
+                  <h2 class="wealth-title">$1 million</h2>
+                </div>
+                <div class="wealth-wrapper">
+                  <div class="wealth billion">
+                    <h2 class="wealth-title">$1 billion</h2>
+                  </div>
+                </div>
+                <div class="wealth-wrapper yale">
+                  <div id="yale" class="wealth ruler">
+                    <div class="key">
+                      <span>50m</span>
+                    </div>
+                    <h2 class="wealth-title">$40.7 billion (Yale University endowment)</h2>
+                    <div class="counter" id="yale-counter"></div>
+                    ${htmlContent}
+                  </div>
+                </div>
+                <div class="wealth-wrapper yale-growth">
+                  <div id="yale-growth" class="wealth growth-wealth">
+                    <h2 class="wealth-title">Yale's Growth While You Browse</h2>
+                    <div class="growth-container">
+                      <div class="growth-pixel-area" id="growth-pixel-area">
+                        <div class="growth-counter" id="growth-counter">$0</div>
+                      </div>
+                      <div class="growth-info">
+                        <p>Growing in real-time based on your time on this page (shows up to 1 hour of growth)</p>
+                        <p class="growth-rate">Growth rate: <span id="growth-rate">0%</span></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="footer">
+            </div>
+            <script type="text/javascript" src="main.js?version=1.10"><\/script>
+          </body>
+          </html>
+        `);
+        newWindow.document.close();
+        
+        this.showStatus('New page generated with your infoboxes! Check the new tab.');
+      }
+      
+      updateInfoboxCount() {
+        document.getElementById('infobox-count').textContent = this.infoboxes.length;
+      }
+      
+      showStatus(message, type = 'info') {
+        const statusElement = document.getElementById('status-message');
+        statusElement.textContent = message;
+        statusElement.style.color = type === 'error' ? '#dc3545' : '#666';
+      }
+    }
+    
+    // Initialize the configurator
+    const configurator = new InfoboxConfigurator();
+    
+    // Auto-scroll to 2/3 position when page loads
+    window.addEventListener('load', () => {
+      const previewArea = document.querySelector('.preview-area');
+      if (previewArea) {
+        const scrollWidth = previewArea.scrollWidth;
+        const clientWidth = previewArea.clientWidth;
+        const scrollTo = (scrollWidth - clientWidth) * 0.67; // 2/3 position
+        previewArea.scrollLeft = scrollTo;
+      }
+    });
+  </script>
+</body>
+</html>

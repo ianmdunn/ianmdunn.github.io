@@ -133,6 +133,51 @@ if (babies && babyCounter) {
 // Track previous scroll position for direction detection
 let previousScrollPosition = 0;
 
+// Mobile wealth bar height calculation function
+function calculateMobileWealthBarHeight(value) {
+  const isMobile = window.innerWidth <= 450;
+  if (!isMobile) return null;
+  
+  // Use display width as base dimension
+  const displayWidth = window.innerWidth;
+  const billionValue = 1000000000; // $1 billion as reference
+  
+  // Calculate height based on wealth ratio to $1 billion
+  const proportion = value / billionValue;
+  
+  // Base height calculation using display width
+  // $1 billion gets 60% of display width height
+  const billionHeight = displayWidth * 0.6; // 60% of display width for $1 billion
+  const height = Math.max(40, proportion * billionHeight); // Minimum 40px
+  
+  return Math.round(height);
+}
+
+// Function to update mobile wealth bar heights
+function updateMobileWealthBarHeights() {
+  const isMobile = window.innerWidth <= 450;
+  if (!isMobile) return;
+  
+  // Calculate heights based on values - focus on 4 main bars
+  const wealthBars = {
+    'one-thousand': 1000,
+    'median-wage': 72000,
+    'million': 1000000,
+    'billion': 1000000000
+  };
+  
+  // Set CSS custom properties for mobile heights
+  Object.keys(wealthBars).forEach(key => {
+    const height = calculateMobileWealthBarHeight(wealthBars[key]);
+    if (height) {
+      document.documentElement.style.setProperty(
+        `--mobile-${key}-height`, 
+        height + 'px'
+      );
+    }
+  });
+}
+
 function updateWealthCounter() {
   var yaleElement = getYaleElement();
   var yaleCounterElement = getYaleCounter();
@@ -140,7 +185,7 @@ function updateWealthCounter() {
 
   if (yaleElement && yaleCounterElement) {
     if (isMobile) {
-      // Mobile: Use vertical scroll position
+      // Mobile: Use vertical scroll position with mobile-specific logic
       var yaleRect = yaleElement.getBoundingClientRect();
       var yaleTop = yaleRect.top;
       var viewportHeight = window.innerHeight;
@@ -160,6 +205,27 @@ function updateWealthCounter() {
       } else if (!shouldShow && wasVisible) {
         // Hide counter when Yale element is not visible
         yaleCounterElement.style.display = 'none';
+      }
+      
+      // Mobile counter positioning and styling
+      if (isMobile) {
+        yaleCounterElement.style.position = 'fixed';
+        yaleCounterElement.style.bottom = '10px';
+        yaleCounterElement.style.left = '10px';
+        yaleCounterElement.style.top = 'auto';
+        yaleCounterElement.style.right = 'auto';
+        yaleCounterElement.style.transform = 'none';
+        yaleCounterElement.style.zIndex = '1000';
+        yaleCounterElement.style.backgroundColor = 'rgba(40, 109, 192, 0.9)';
+        yaleCounterElement.style.color = 'white';
+        yaleCounterElement.style.padding = '5px';
+        yaleCounterElement.style.borderRadius = '6px';
+        yaleCounterElement.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
+        yaleCounterElement.style.fontSize = '14px';
+        yaleCounterElement.style.fontWeight = 'bold';
+        yaleCounterElement.style.minWidth = 'auto';
+        yaleCounterElement.style.maxWidth = '150px';
+        yaleCounterElement.style.textAlign = 'center';
       }
       
       // Always update the value when counter is visible
@@ -1061,6 +1127,9 @@ document.addEventListener('DOMContentLoaded', function() {
   initGrowthBar();
   initializeVisibleBlocks(); // Initialize visible blocks on page load
   updateWealthCounter(); // Initialize counter on page load
+  
+  // Initialize mobile layout if needed
+  updateMobileWealthBarHeights();
 });
 
 // Handle resize events for mobile/desktop switching
@@ -1069,6 +1138,7 @@ window.addEventListener('resize', function() {
   setTimeout(() => {
     initializeVisibleBlocks();
     updateWealthCounter();
+    updateMobileWealthBarHeights(); // Update mobile heights on resize
   }, 100);
 });
 

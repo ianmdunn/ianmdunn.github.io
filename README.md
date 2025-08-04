@@ -2,6 +2,25 @@
 
 A powerful visualization of Yale University's $40.7 billion endowment, shown to scale with interactive elements and real-time growth tracking.
 
+## 📝 Infobox Management
+
+The visualization now uses a **configurator-based approach** for managing infoboxes:
+
+### 🎛️ Using the Configurator
+1. **Open the configurator**: Navigate to `configurator.html`
+2. **Import original infoboxes**: Click "Import Original Infoboxes" to load all existing infoboxes
+3. **Create new infoboxes**: Use the form to add new infoboxes with custom content
+4. **Edit existing infoboxes**: Select any infobox from the list to edit its content and position
+5. **Position infoboxes**: Drag infoboxes in the preview area to position them
+6. **Apply changes**: Click "Apply to Main Page" to generate the updated visualization
+
+### 📁 File Structure
+- `index.html` - Main visualization (infoboxes are now managed via configurator)
+- `configurator.html` - Tool for adding, editing, and positioning infoboxes
+- `mobile_test.html` - Mobile layout testing
+- `main.css` - Styles for the visualization
+- `main.js` - Interactive functionality
+
 ## Browser Compatibility
 
 This page is designed to work across **all modern browsers** and includes comprehensive fallbacks for older browsers. Here's what we support:
