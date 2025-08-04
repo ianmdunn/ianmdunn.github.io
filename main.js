@@ -1130,6 +1130,9 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Initialize mobile layout if needed
   updateMobileWealthBarHeights();
+  
+  // Initialize configurator popup
+  initializeConfiguratorPopup();
 });
 
 // Handle resize events for mobile/desktop switching
@@ -1141,6 +1144,46 @@ window.addEventListener('resize', function() {
     updateMobileWealthBarHeights(); // Update mobile heights on resize
   }, 100);
 });
+
+// Configurator popup functionality
+function initializeConfiguratorPopup() {
+  const toggle = document.getElementById('configurator-toggle');
+  const panel = document.getElementById('configurator-panel');
+  const close = document.getElementById('configurator-close');
+  
+  if (!toggle || !panel || !close) {
+    console.log('Configurator popup elements not found');
+    return;
+  }
+  
+  // Toggle panel visibility
+  toggle.addEventListener('click', function(e) {
+    e.stopPropagation();
+    panel.classList.toggle('show');
+  });
+  
+  // Close panel when clicking close button
+  close.addEventListener('click', function(e) {
+    e.stopPropagation();
+    panel.classList.remove('show');
+  });
+  
+  // Close panel when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!toggle.contains(e.target) && !panel.contains(e.target)) {
+      panel.classList.remove('show');
+    }
+  });
+  
+  // Close panel on escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      panel.classList.remove('show');
+    }
+  });
+  
+  console.log('Configurator popup initialized');
+}
 
 } catch (error) {
   console.error('=== JAVASCRIPT ERROR ===', error);
