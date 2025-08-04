@@ -25,6 +25,7 @@
       border-right: 1px solid #dee2e6;
       padding: 20px;
       overflow-y: auto;
+      height: 100vh;
       writing-mode: horizontal-tb !important;
       text-orientation: mixed !important;
       direction: ltr !important;
@@ -86,6 +87,7 @@
       width: 50%;
       display: flex;
       flex-direction: column;
+      height: 100vh;
     }
 
     .toolbar {
@@ -103,9 +105,65 @@
       overflow: auto;
       position: relative;
       overflow-x: auto;
-      overflow-y: auto;
-      min-width: 800px;
+      overflow-y: hidden;
+      min-width: 600px;
       scroll-behavior: smooth;
+      height: calc(100vh - 200px);
+      max-height: calc(100vh - 200px);
+    }
+
+    /* Custom scrollbar for preview area */
+    .preview-area::-webkit-scrollbar {
+      height: 20px;
+    }
+
+    .preview-area::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+      position: relative;
+    }
+
+    .preview-area::-webkit-scrollbar-thumb {
+      background: #ba0c2f;
+      border-radius: 10px;
+    }
+
+    .preview-area::-webkit-scrollbar-thumb:hover {
+      background: #a00a28;
+    }
+
+    /* Timeline markers on scrollbar */
+    .preview-area {
+      position: relative;
+    }
+
+    .timeline-bar {
+      position: relative;
+      width: 100%;
+      height: 20px;
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      margin: 10px 0;
+      z-index: 1000;
+    }
+
+    .timeline-marker {
+      position: absolute;
+      top: 2px;
+      width: 4px;
+      height: 16px;
+      background: #ff6900;
+      border-radius: 2px;
+      pointer-events: auto;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 1001;
+    }
+
+    .timeline-marker:hover {
+      background: #e55a00;
+      transform: scaleY(1.2);
     }
 
     .config-section {
@@ -155,6 +213,11 @@
     textarea.form-control {
       min-height: 80px;
       resize: vertical;
+    }
+    
+    #infobox-title {
+      min-height: 60px !important;
+      font-family: inherit;
     }
 
     .btn {
@@ -244,10 +307,12 @@
 
     .preview-container {
       min-height: 600px;
-      min-width: 1200px;
+      width: 100%;
+      max-width: 1200px;
       background: linear-gradient(90deg, #f8f9fa 0%, #e9ecef 100%);
       position: relative;
       padding: 20px;
+      overflow: visible;
     }
 
     .overview-preview {
@@ -370,7 +435,16 @@
       padding: 15px;
       max-width: 300px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      cursor: move;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      pointer-events: auto;
+      z-index: 10;
+    }
+    
+    .infobox-preview:hover {
+      border-color: #ba0c2f;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transform: translateY(-2px);
     }
 
     .infobox-preview.selected {
@@ -410,6 +484,8 @@
       color: #666;
     }
 
+
+
     .drag-handle {
       position: absolute;
       top: 5px;
@@ -441,6 +517,8 @@
       align-items: center;
       justify-content: center;
     }
+
+
   </style>
 </head>
 <body>
@@ -448,15 +526,28 @@
     <div class="sidebar">
       <h2 style="margin: 0 0 25px 0; color: #ba0c2f; font-size: 20px; line-height: 1.3;">Yale Endowment Configurator</h2>
       
-      <!-- Instructions -->
-      <div class="config-section" style="background: #e3f2fd; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
-        <h3 style="margin: 0 0 10px 0; color: #1976d2;">How to Use</h3>
-        <div style="font-size: 13px; line-height: 1.4; color: #333;">
-          <p><strong>1.</strong> Use the form below to create new infoboxes</p>
-          <p><strong>2.</strong> Drag infoboxes in the preview area to position them</p>
-          <p><strong>3.</strong> Edit existing infoboxes by selecting them from the list</p>
-          <p><strong>4.</strong> Click "Apply to Main Page" to generate the updated visualization</p>
+      <!-- Yale Wealth Bar Configuration -->
+      <div class="config-section" style="background: #e8f5e8; padding: 15px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #d4edda;">
+        <h4 style="margin: 0 0 10px 0; color: #155724;">Yale Wealth Bar Settings</h4>
+        <div class="form-group">
+          <label for="yale-endowment-value">Yale Endowment Value (billions)</label>
+          <input type="number" id="yale-endowment-value" class="form-control" value="40.7" min="1" max="1000" step="0.1">
         </div>
+        <div class="form-group">
+          <label for="scale-factor">Scale Factor (pixels per $1,000)</label>
+          <input type="number" id="scale-factor" class="form-control" value="1" min="0.1" max="10" step="0.1">
+        </div>
+        <div style="font-size: 12px; color: #666; margin-top: 5px;">
+          Current width: <span id="current-width">40,700</span> pixels | 
+          Scale: 1 pixel = $<span id="current-scale">1,000</span>
+        </div>
+      </div>
+      
+      <!-- Help Button -->
+      <div style="margin-bottom: 20px;">
+        <button class="btn btn-info" id="help-button" style="width: 100%;">
+          <span style="margin-right: 8px;">?</span>How to Use
+        </button>
       </div>
       
       <!-- Infobox Configuration -->
@@ -464,13 +555,16 @@
         <h3>Infobox Configuration</h3>
         
         <div class="form-group">
-          <label for="infobox-title">Title</label>
-          <input type="text" id="infobox-title" class="form-control" placeholder="Enter infobox title">
+          <label for="infobox-title">Title (supports HTML)</label>
+          <textarea id="infobox-title" class="form-control" placeholder="Enter infobox title (supports HTML formatting)" style="min-height: 60px; resize: vertical;"></textarea>
+          <div style="font-size: 12px; color: #666; margin-top: 5px;">
+            Examples: <code>&lt;strong&gt;Bold text&lt;/strong&gt;</code>, <code>&lt;em&gt;Italic&lt;/em&gt;</code>, <code>&lt;a href="#"&gt;Link&lt;/a&gt;</code>
+          </div>
         </div>
         
         <div class="form-group">
-          <label for="infobox-content">Content</label>
-          <textarea id="infobox-content" class="form-control" placeholder="Enter infobox content (supports HTML)"></textarea>
+          <label for="infobox-content">Content (Optional)</label>
+          <textarea id="infobox-content" class="form-control" placeholder="Enter infobox content (supports HTML) - leave empty for title-only infoboxes"></textarea>
         </div>
         
         <div class="form-group">
@@ -478,9 +572,81 @@
           <select id="infobox-type" class="form-control">
             <option value="text">Text Only</option>
             <option value="block">Text with Visual Block</option>
-            <option value="square">Text with Square Block</option>
+            <option value="media">Text with Media</option>
           </select>
         </div>
+        
+        <!-- Visual Block Configuration -->
+        <div id="visual-block-config" class="config-section" style="display: none !important; background: #f8f9fa; padding: 15px; border-radius: 4px; margin-top: 15px;">
+          <h4 style="margin: 0 0 10px 0; color: #495057;">Visual Block Settings</h4>
+          <div class="form-group">
+            <label for="block-color">Block Color</label>
+            <input type="color" id="block-color" class="form-control" value="#ff6900" style="width: 60px; height: 35px; cursor: pointer;">
+          </div>
+          <div class="form-group">
+            <label for="block-dollar-value">Block Dollar Value</label>
+            <input type="number" id="block-dollar-value" class="form-control" placeholder="Enter dollar amount (e.g., 1000000)" min="0" step="1000" style="border: 2px solid #007bff;">
+            <div style="font-size: 12px; color: #666; margin-top: 5px;">
+              Enter a dollar amount to calculate block width based on Yale wealth bar scale
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="block-height">Block Height (px)</label>
+            <input type="number" id="block-height" class="form-control" value="40" min="10" max="200">
+            <div style="font-size: 12px; color: #666; margin-top: 5px;">
+              Height of the visual block
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="block-padding">Top Padding (px)</label>
+            <input type="number" id="block-padding" class="form-control" value="20" min="0" max="100">
+            <div style="font-size: 12px; color: #666; margin-top: 5px;">
+              Distance between block and text above
+            </div>
+          </div>
+        </div>
+        
+        <!-- Media Configuration -->
+        <div id="media-config" class="config-section" style="display: none !important; background: #f8f9fa; padding: 15px; border-radius: 4px; margin-top: 15px;">
+          <h4 style="margin: 0 0 10px 0; color: #495057;">Media Settings</h4>
+          <div class="form-group">
+            <label for="media-type">Media Type</label>
+            <select id="media-type" class="form-control">
+              <option value="image">Image</option>
+              <option value="video">Video</option>
+              <option value="iframe">Embedded Content</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="media-url">Media URL</label>
+            <input type="url" id="media-url" class="form-control" placeholder="Enter media URL or upload file">
+          </div>
+          <div class="form-group">
+            <label for="media-file">Upload File</label>
+            <input type="file" id="media-file" class="form-control" accept="image/*,video/*">
+          </div>
+          <div class="form-group">
+            <label for="media-width">Media Width (px)</label>
+            <input type="number" id="media-width" class="form-control" value="200" min="50" max="500">
+          </div>
+          <div class="form-group">
+            <label for="media-height">Media Height (px)</label>
+            <input type="number" id="media-height" class="form-control" value="150" min="50" max="400">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="timeline-position">Timeline Position (0-100%)</label>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <input type="range" id="timeline-position" class="form-control" min="0" max="100" value="10" style="flex: 1;">
+            <span id="timeline-value" style="min-width: 40px; text-align: right; font-weight: 600;">10%</span>
+          </div>
+          <div style="font-size: 12px; color: #666; margin-top: 5px;">
+            Position along the Yale endowment timeline (0% = start, 100% = end)
+          </div>
+        </div>
+        
+
         
         <div class="btn-group">
           <button class="btn btn-primary" id="add-infobox">Add Infobox</button>
@@ -504,6 +670,11 @@
       <!-- Export Section -->
       <div class="export-section">
         <h3>Export Configuration</h3>
+        <div style="margin-bottom: 15px;">
+          <button class="btn btn-success" id="export-config">Export Config</button>
+          <button class="btn btn-info" id="import-config">Import Config</button>
+          <input type="file" id="config-file-input" accept=".json" style="display: none;">
+        </div>
         <button class="btn btn-success" id="export-html">Export HTML</button>
         <button class="btn btn-success" id="export-css">Export CSS</button>
         <button class="btn btn-primary" id="apply-to-main">Apply to Main Page</button>
@@ -533,10 +704,37 @@
           </div>
           <!-- Infoboxes will be placed here -->
         </div>
+        
+      </div>
+      
+      <!-- Timeline bar with markers -->
+      <div class="timeline-bar" id="timeline-bar">
+        <!-- Markers will be added here -->
       </div>
       
       <div class="status-bar">
         <span id="status-message">Start by creating your first infobox using the form above</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Modal -->
+  <div id="help-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="margin: 0; color: #1976d2;">How to Use the Configurator</h3>
+        <button id="close-help" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">×</button>
+      </div>
+      <div style="font-size: 14px; line-height: 1.6; color: #333;">
+        <p><strong>1.</strong> Use the form below to create new infoboxes (title required, content optional)</p>
+        <p><strong>2.</strong> Both title and content support HTML formatting</p>
+        <p><strong>3.</strong> Drag infoboxes in the preview area to position them</p>
+        <p><strong>4.</strong> Click on any infobox in the preview to edit it</p>
+        <p><strong>5.</strong> Click "Apply to Main Page" to generate the updated visualization</p>
+        <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;">
+        <p><strong>Yale Wealth Bar:</strong> Configure the endowment value and scale factor at the top to adjust the timeline width and visual block calculations.</p>
+        <p><strong>Visual Blocks:</strong> Use the dollar value field to automatically calculate block width based on the Yale wealth bar scale.</p>
+        <p><strong>Media:</strong> Upload images/videos or link to external content for rich infoboxes.</p>
       </div>
     </div>
   </div>
@@ -552,7 +750,137 @@
         
         this.initializeEventListeners();
         this.updateInfoboxCount();
+        this.updateYaleWealthBar(); // Initialize Yale wealth bar
+        
+        // Initialize timeline wealth value
+        const initialPercentage = document.getElementById('timeline-position').value;
+        this.updateTimelineWealthValue(initialPercentage);
+        
         this.showStatus('Start by creating your first infobox using the form above');
+        
+        // Initialize type config based on current selector value
+        const currentType = document.getElementById('infobox-type').value;
+        this.showTypeConfig(currentType);
+      }
+      
+      showTypeConfig(type) {
+        // Hide all config sections
+        const visualBlockConfig = document.getElementById('visual-block-config');
+        const mediaConfig = document.getElementById('media-config');
+        
+        if (visualBlockConfig) {
+          visualBlockConfig.style.setProperty('display', 'none', 'important');
+        }
+        if (mediaConfig) {
+          mediaConfig.style.setProperty('display', 'none', 'important');
+        }
+        
+        // Show relevant config section based on type
+        if (type === 'block' && visualBlockConfig) {
+          visualBlockConfig.style.setProperty('display', 'block', 'important');
+        } else if (type === 'media' && mediaConfig) {
+          mediaConfig.style.setProperty('display', 'block', 'important');
+        }
+        // For 'text' type, no additional config is shown
+        
+        // Update status to show current type
+        this.showStatus(`Type set to: ${type}`);
+      }
+      
+      handleMediaFileUpload(file) {
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          document.getElementById('media-url').value = e.target.result;
+          this.showStatus(`Media file "${file.name}" loaded successfully`);
+        };
+        reader.readAsDataURL(file);
+      }
+      
+      updateYaleWealthBar() {
+        const endowmentValue = parseFloat(document.getElementById('yale-endowment-value').value);
+        const scaleFactor = parseFloat(document.getElementById('scale-factor').value);
+        
+        // Calculate width in pixels
+        const widthInPixels = (endowmentValue * 1000000000) / (1000 / scaleFactor);
+        
+        // Update display
+        document.getElementById('current-width').textContent = Math.round(widthInPixels).toLocaleString();
+        document.getElementById('current-scale').textContent = (1000 / scaleFactor).toLocaleString();
+        
+        // Update preview ruler
+        const rulerPreview = document.querySelector('.yale-ruler-preview');
+        if (rulerPreview) {
+          rulerPreview.style.width = `${widthInPixels}px`;
+          rulerPreview.querySelector('div:first-child').textContent = `Yale Endowment: $${endowmentValue} billion`;
+          rulerPreview.querySelector('div:last-child').textContent = `Scale: 1 pixel = $${(1000 / scaleFactor).toLocaleString()}`;
+        }
+        
+        this.showStatus(`Updated Yale wealth bar: ${endowmentValue} billion at ${scaleFactor}x scale`);
+      }
+      
+      getYaleWealthBarConfig() {
+        const endowmentValue = parseFloat(document.getElementById('yale-endowment-value').value);
+        const scaleFactor = parseFloat(document.getElementById('scale-factor').value);
+        const widthInPixels = (endowmentValue * 1000000000) / (1000 / scaleFactor);
+        
+        return {
+          endowmentValue: endowmentValue,
+          scaleFactor: scaleFactor,
+          widthInPixels: widthInPixels,
+          pixelsPerDollar: scaleFactor / 1000
+        };
+      }
+      
+      updateTimelineWealthValue(percentage) {
+        const endowmentValue = parseFloat(document.getElementById('yale-endowment-value').value);
+        const timelinePercentage = parseFloat(percentage) / 100;
+        
+        // Calculate the wealth value at this timeline position
+        // Assuming linear distribution across the timeline
+        const wealthAtPosition = endowmentValue * timelinePercentage;
+        
+        // Format the wealth value for display
+        let wealthDisplay;
+        if (wealthAtPosition >= 1) {
+          wealthDisplay = `$${wealthAtPosition.toFixed(1)} billion`;
+        } else {
+          wealthDisplay = `$${(wealthAtPosition * 1000).toFixed(0)} million`;
+        }
+        
+        // Update the timeline value display to show both percentage and wealth
+        document.getElementById('timeline-value').textContent = `${percentage}% (${wealthDisplay})`;
+      }
+      
+      formatMoney(amount) {
+        // Format money similar to main.js
+        if (amount >= 1000000000) {
+          return `$${(amount / 1000000000).toFixed(1)}B`;
+        } else if (amount >= 1000000) {
+          return `$${(amount / 1000000).toFixed(1)}M`;
+        } else if (amount >= 1000) {
+          return `$${(amount / 1000).toFixed(0)}K`;
+        } else {
+          return `$${amount.toFixed(0)}`;
+        }
+      }
+      
+      updateVisualBlockFromDollarValue() {
+        const dollarValue = parseFloat(document.getElementById('block-dollar-value').value);
+        if (dollarValue && dollarValue > 0) {
+          const height = parseInt(document.getElementById('block-height').value);
+          
+          // Calculate area based on dollar value
+          // Use a reasonable scale: 1 square pixel = $1,000
+          const areaScale = 1 / 1000; // 1 square pixel per $1,000
+          const totalArea = dollarValue * areaScale;
+          
+          // Calculate width based on area and height
+          const calculatedWidth = totalArea / height;
+          
+          this.showStatus(`Calculated width: ${Math.round(calculatedWidth)}px for $${dollarValue.toLocaleString()} (area: ${Math.round(totalArea)} sq px)`);
+        }
       }
       
       initializeEventListeners() {
@@ -583,6 +911,18 @@
         });
         
         // Export buttons
+        document.getElementById('export-config').addEventListener('click', () => {
+          this.exportConfig();
+        });
+        
+        document.getElementById('import-config').addEventListener('click', () => {
+          document.getElementById('config-file-input').click();
+        });
+        
+        document.getElementById('config-file-input').addEventListener('change', (e) => {
+          this.importConfig(e.target.files[0]);
+        });
+        
         document.getElementById('export-html').addEventListener('click', () => {
           this.exportHTML();
         });
@@ -595,11 +935,81 @@
           this.applyToMainPage();
         });
         
+        // Timeline slider
+        document.getElementById('timeline-position').addEventListener('input', (e) => {
+          const percentage = e.target.value;
+          document.getElementById('timeline-value').textContent = `${percentage}%`;
+          this.updateTimelineWealthValue(percentage);
+        });
+        
+        // Type selector
+        document.getElementById('infobox-type').addEventListener('change', (e) => {
+          this.showTypeConfig(e.target.value);
+        });
+        
+        // Media file upload
+        document.getElementById('media-file').addEventListener('change', (e) => {
+          this.handleMediaFileUpload(e.target.files[0]);
+        });
+        
+        // Yale wealth bar configuration
+        document.getElementById('yale-endowment-value').addEventListener('input', (e) => {
+          this.updateYaleWealthBar();
+          // Update timeline wealth value when endowment value changes
+          const currentPercentage = document.getElementById('timeline-position').value;
+          this.updateTimelineWealthValue(currentPercentage);
+        });
+        
+        document.getElementById('scale-factor').addEventListener('input', (e) => {
+          this.updateYaleWealthBar();
+        });
+        
+        // Visual block dollar value
+        document.getElementById('block-dollar-value').addEventListener('input', (e) => {
+          this.updateVisualBlockFromDollarValue();
+        });
+        
+        // Help modal
+        document.getElementById('help-button').addEventListener('click', () => {
+          document.getElementById('help-modal').style.display = 'block';
+        });
+        
+        document.getElementById('close-help').addEventListener('click', () => {
+          document.getElementById('help-modal').style.display = 'none';
+        });
+        
+        // Close modal when clicking outside
+        document.getElementById('help-modal').addEventListener('click', (e) => {
+          if (e.target.id === 'help-modal') {
+            document.getElementById('help-modal').style.display = 'none';
+          }
+        });
+        
         // Preview area events
         const previewContainer = document.getElementById('preview-container');
         previewContainer.addEventListener('mousedown', (e) => {
           if (this.isEditMode && e.target.classList.contains('infobox-preview')) {
             this.startDrag(e);
+          }
+        });
+        
+        // Click to select infobox for editing
+        previewContainer.addEventListener('click', (e) => {
+          // Don't trigger if we were dragging
+          if (this.isDragging) return;
+          
+          // Don't trigger if clicking on drag handle or delete button
+          if (e.target.classList.contains('drag-handle') || e.target.classList.contains('delete-btn')) {
+            return;
+          }
+          
+          if (e.target.classList.contains('infobox-preview') || e.target.closest('.infobox-preview')) {
+            const infoboxElement = e.target.classList.contains('infobox-preview') ? e.target : e.target.closest('.infobox-preview');
+            const infoboxId = parseInt(infoboxElement.id.replace('infobox-', ''));
+            const infobox = this.infoboxes.find(inf => inf.id === infoboxId);
+            if (infobox) {
+              this.selectInfobox(infobox);
+            }
           }
         });
         
@@ -620,27 +1030,67 @@
         const title = document.getElementById('infobox-title').value.trim();
         const content = document.getElementById('infobox-content').value.trim();
         const type = document.getElementById('infobox-type').value;
+        const timelinePosition = parseInt(document.getElementById('timeline-position').value);
         
-        if (!title || !content) {
-          this.showStatus('Please fill in both title and content', 'error');
+        if (!title) {
+          this.showStatus('Please fill in at least a title', 'error');
           return;
         }
+        
+        // Calculate position based on timeline percentage using configurable Yale wealth bar
+        const yaleConfig = this.getYaleWealthBarConfig();
+        const timelineWidth = yaleConfig.widthInPixels;
+        const previewPadding = 20; // Padding of preview container
+        const x = (timelinePosition / 100) * timelineWidth + previewPadding;
+        const y = 160; // 40% above bottom of wealth bar (400px height)
+        
+        // Get visual block properties
+        const dollarValue = parseFloat(document.getElementById('block-dollar-value').value);
+        const height = parseInt(document.getElementById('block-height').value);
+        let calculatedWidth = 20; // Default width
+        
+        if (dollarValue && dollarValue > 0) {
+          // Calculate area based on dollar value
+          const areaScale = 1 / 1000; // 1 square pixel per $1,000
+          const totalArea = dollarValue * areaScale;
+          calculatedWidth = totalArea / height;
+        }
+        
+        const visualBlockProps = {
+          color: document.getElementById('block-color').value,
+          width: Math.round(calculatedWidth),
+          height: parseInt(document.getElementById('block-height').value),
+          padding: parseInt(document.getElementById('block-padding').value),
+          borderRadius: 0
+        };
+        
+        // Get media properties
+        const mediaProps = {
+          type: document.getElementById('media-type').value,
+          url: document.getElementById('media-url').value,
+          width: parseInt(document.getElementById('media-width').value),
+          height: parseInt(document.getElementById('media-height').value)
+        };
         
         const infobox = {
           id: Date.now(),
           title: title,
           content: content,
           type: type,
-          position: { x: 50, y: 50 },
-          class: `infobox-${this.infoboxes.length + 1}`
+          timelinePosition: timelinePosition,
+          position: { x: x, y: y },
+          class: `infobox-${this.infoboxes.length + 1}`,
+          visualBlockProps: visualBlockProps,
+          mediaProps: mediaProps
         };
         
         this.infoboxes.push(infobox);
         this.renderInfobox(infobox);
         this.updateInfoboxList();
         this.updateInfoboxCount();
+        this.updateTimelineScrollbar();
         this.clearForm();
-        this.showStatus(`Infobox "${title}" added successfully`);
+        this.showStatus(`Infobox "${title}" added at ${timelinePosition}% on timeline`);
       }
       
       updateInfobox() {
@@ -649,20 +1099,62 @@
         const title = document.getElementById('infobox-title').value.trim();
         const content = document.getElementById('infobox-content').value.trim();
         const type = document.getElementById('infobox-type').value;
+        const timelinePosition = parseInt(document.getElementById('timeline-position').value);
         
-        if (!title || !content) {
-          this.showStatus('Please fill in both title and content', 'error');
+        if (!title) {
+          this.showStatus('Please fill in at least a title', 'error');
           return;
         }
+        
+        // Calculate position based on timeline percentage using configurable Yale wealth bar
+        const yaleConfig = this.getYaleWealthBarConfig();
+        const timelineWidth = yaleConfig.widthInPixels;
+        const previewPadding = 20; // Padding of preview container
+        const x = (timelinePosition / 100) * timelineWidth + previewPadding;
+        const y = 160; // 40% above bottom of wealth bar (400px height)
+        
+        // Get visual block properties
+        const dollarValue = parseFloat(document.getElementById('block-dollar-value').value);
+        const height = parseInt(document.getElementById('block-height').value);
+        let calculatedWidth = 20; // Default width
+        
+        if (dollarValue && dollarValue > 0) {
+          // Calculate area based on dollar value
+          const areaScale = 1 / 1000; // 1 square pixel per $1,000
+          const totalArea = dollarValue * areaScale;
+          calculatedWidth = totalArea / height;
+        }
+        
+        const visualBlockProps = {
+          color: document.getElementById('block-color').value,
+          width: Math.round(calculatedWidth),
+          height: parseInt(document.getElementById('block-height').value),
+          padding: parseInt(document.getElementById('block-padding').value),
+          borderRadius: 0
+        };
+        
+        // Get media properties
+        const mediaProps = {
+          type: document.getElementById('media-type').value,
+          url: document.getElementById('media-url').value,
+          width: parseInt(document.getElementById('media-width').value),
+          height: parseInt(document.getElementById('media-height').value)
+        };
         
         this.selectedInfobox.title = title;
         this.selectedInfobox.content = content;
         this.selectedInfobox.type = type;
+        this.selectedInfobox.timelinePosition = timelinePosition;
+        this.selectedInfobox.position = { x: x, y: y };
+        this.selectedInfobox.visualBlockProps = visualBlockProps;
+        this.selectedInfobox.mediaProps = mediaProps;
         
         this.updateInfoboxDisplay(this.selectedInfobox);
+        this.updateInfoboxPosition(this.selectedInfobox);
         this.updateInfoboxList();
+        this.updateTimelineScrollbar();
         this.clearForm();
-        this.showStatus(`Infobox "${title}" updated successfully`);
+        this.showStatus(`Infobox "${title}" updated at ${timelinePosition}% on timeline`);
         this.selectedInfobox = null;
         document.getElementById('update-infobox').style.display = 'none';
         document.getElementById('add-infobox').style.display = 'inline-block';
@@ -680,18 +1172,84 @@
           <div class="drag-handle">⋮</div>
           <button class="delete-btn" onclick="configurator.deleteInfobox(${infobox.id})">×</button>
           <div class="title">${infobox.title}</div>
-          <div class="content">${infobox.content}</div>
+          ${infobox.content ? `<div class="content">${infobox.content}</div>` : ''}
+          <div class="click-hint" style="position: absolute; bottom: 5px; right: 5px; font-size: 10px; color: #666; opacity: 0.7;">Click to edit</div>
         `;
         
         infoboxElement.innerHTML = content;
         previewContainer.appendChild(infoboxElement);
+        
+        // Add visual block above for block type
+        if (infobox.type === 'block') {
+          const visualBlock = document.createElement('div');
+          visualBlock.style.position = 'absolute';
+          visualBlock.style.left = `${infobox.position.x}px`;
+          
+          // Use custom properties if available, otherwise use defaults
+          const props = infobox.visualBlockProps || {};
+          const padding = props.padding || 20;
+          visualBlock.style.top = `${infobox.position.y - props.height - padding}px`;
+          
+          visualBlock.style.width = `${props.width || 20}px`;
+          visualBlock.style.height = `${props.height || 40}px`;
+          visualBlock.style.backgroundColor = props.color || '#ff6900';
+          visualBlock.style.borderRadius = '0px';
+          
+          visualBlock.id = `visual-block-${infobox.id}`;
+          previewContainer.appendChild(visualBlock);
+        }
+        
+        // Add media for media type
+        if (infobox.type === 'media' && infobox.mediaProps && infobox.mediaProps.url) {
+          const mediaContainer = document.createElement('div');
+          mediaContainer.style.position = 'absolute';
+          mediaContainer.style.left = `${infobox.position.x}px`;
+          mediaContainer.style.top = `${infobox.position.y - 80}px`;
+          mediaContainer.style.width = `${infobox.mediaProps.width || 200}px`;
+          mediaContainer.style.height = `${infobox.mediaProps.height || 150}px`;
+          mediaContainer.style.border = '1px solid #ddd';
+          mediaContainer.style.borderRadius = '4px';
+          mediaContainer.style.overflow = 'hidden';
+          mediaContainer.id = `media-${infobox.id}`;
+          
+          const props = infobox.mediaProps;
+          if (props.type === 'image') {
+            mediaContainer.innerHTML = `<img src="${props.url}" style="width: 100%; height: 100%; object-fit: cover;">`;
+          } else if (props.type === 'video') {
+            mediaContainer.innerHTML = `<video src="${props.url}" controls style="width: 100%; height: 100%; object-fit: cover;"></video>`;
+          } else if (props.type === 'iframe') {
+            mediaContainer.innerHTML = `<iframe src="${props.url}" style="width: 100%; height: 100%; border: none;"></iframe>`;
+          }
+          
+          previewContainer.appendChild(mediaContainer);
+        }
       }
       
       updateInfoboxDisplay(infobox) {
         const element = document.getElementById(`infobox-${infobox.id}`);
         if (element) {
-          element.querySelector('.title').textContent = infobox.title;
-          element.querySelector('.content').innerHTML = infobox.content;
+          element.querySelector('.title').innerHTML = infobox.title;
+          
+          // Update or create content div
+          let contentDiv = element.querySelector('.content');
+          if (infobox.content) {
+            if (!contentDiv) {
+              contentDiv = document.createElement('div');
+              contentDiv.className = 'content';
+              element.querySelector('.title').after(contentDiv);
+            }
+            contentDiv.innerHTML = infobox.content;
+          } else if (contentDiv) {
+            contentDiv.remove();
+          }
+        }
+      }
+      
+      updateInfoboxPosition(infobox) {
+        const element = document.getElementById(`infobox-${infobox.id}`);
+        if (element) {
+          element.style.left = `${infobox.position.x}px`;
+          element.style.top = `${infobox.position.y}px`;
         }
       }
       
@@ -706,7 +1264,7 @@
           
           item.innerHTML = `
             <div class="title">${infobox.title}</div>
-            <div class="type">${infobox.type}</div>
+            <div class="type">${infobox.type} • ${infobox.timelinePosition || 10}%</div>
           `;
           
           list.appendChild(item);
@@ -720,6 +1278,27 @@
         document.getElementById('infobox-title').value = infobox.title;
         document.getElementById('infobox-content').value = infobox.content;
         document.getElementById('infobox-type').value = infobox.type;
+        document.getElementById('timeline-position').value = infobox.timelinePosition || 10;
+        this.updateTimelineWealthValue(infobox.timelinePosition || 10);
+        
+        // Update visual block properties
+        if (infobox.visualBlockProps) {
+          document.getElementById('block-color').value = infobox.visualBlockProps.color || '#ff6900';
+          document.getElementById('block-height').value = infobox.visualBlockProps.height || 40;
+          document.getElementById('block-padding').value = infobox.visualBlockProps.padding || 20;
+          document.getElementById('block-dollar-value').value = infobox.visualBlockProps.dollarValue || '';
+        }
+        
+        // Update media properties
+        if (infobox.mediaProps) {
+          document.getElementById('media-type').value = infobox.mediaProps.type || 'image';
+          document.getElementById('media-url').value = infobox.mediaProps.url || '';
+          document.getElementById('media-width').value = infobox.mediaProps.width || 200;
+          document.getElementById('media-height').value = infobox.mediaProps.height || 150;
+        }
+        
+        // Show appropriate config section
+        this.showTypeConfig(infobox.type);
         
         // Update buttons
         document.getElementById('add-infobox').style.display = 'none';
@@ -729,7 +1308,7 @@
         document.querySelectorAll('.infobox-preview').forEach(el => el.classList.remove('selected'));
         document.getElementById(`infobox-${infobox.id}`).classList.add('selected');
         
-        this.showStatus(`Selected infobox: "${infobox.title}"`);
+        this.showStatus(`Selected infobox: "${infobox.title}" at ${infobox.timelinePosition || 10}%`);
       }
       
       deleteInfobox(id) {
@@ -738,8 +1317,18 @@
           this.infoboxes.splice(index, 1);
           const element = document.getElementById(`infobox-${id}`);
           if (element) element.remove();
+          
+          // Remove visual block if it exists
+          const visualBlock = document.getElementById(`visual-block-${id}`);
+          if (visualBlock) visualBlock.remove();
+          
+          // Remove media if it exists
+          const media = document.getElementById(`media-${id}`);
+          if (media) media.remove();
+          
           this.updateInfoboxList();
           this.updateInfoboxCount();
+          this.updateTimelineScrollbar();
           this.showStatus('Infobox deleted');
         }
       }
@@ -758,16 +1347,33 @@
         document.getElementById('infobox-title').value = '';
         document.getElementById('infobox-content').value = '';
         document.getElementById('infobox-type').value = 'text';
+        document.getElementById('timeline-position').value = '10';
+        this.updateTimelineWealthValue(10);
+        
+        // Reset visual block properties
+        document.getElementById('block-color').value = '#ff6900';
+        document.getElementById('block-height').value = '40';
+        document.getElementById('block-padding').value = '20';
+        document.getElementById('block-dollar-value').value = '';
+        
+        // Reset media properties
+        document.getElementById('media-type').value = 'image';
+        document.getElementById('media-url').value = '';
+        document.getElementById('media-width').value = '200';
+        document.getElementById('media-height').value = '150';
+        
+        // Hide config sections
+        this.showTypeConfig('text');
       }
       
       setPreviewMode() {
         this.isEditMode = false;
         document.querySelectorAll('.infobox-preview').forEach(el => {
-          el.style.cursor = 'default';
+          el.style.cursor = 'pointer';
           el.querySelector('.drag-handle').style.display = 'none';
           el.querySelector('.delete-btn').style.display = 'none';
         });
-        this.showStatus('Preview mode - infoboxes are locked');
+        this.showStatus('Preview mode - click infoboxes to edit them');
       }
       
       setEditMode() {
@@ -777,7 +1383,7 @@
           el.querySelector('.drag-handle').style.display = 'flex';
           el.querySelector('.delete-btn').style.display = 'flex';
         });
-        this.showStatus('Edit mode - you can drag and delete infoboxes');
+        this.showStatus('Edit mode - you can drag, delete, and click to edit infoboxes');
       }
       
       startDrag(e) {
@@ -796,11 +1402,19 @@
         this.dragTarget.style.left = `${Math.max(0, x)}px`;
         this.dragTarget.style.top = `${Math.max(0, y)}px`;
         
-        // Update position in data
+        // Update position in data and recalculate timeline position
         const id = parseInt(this.dragTarget.id.replace('infobox-', ''));
         const infobox = this.infoboxes.find(inf => inf.id === id);
         if (infobox) {
           infobox.position = { x: Math.max(0, x), y: Math.max(0, y) };
+          
+          // Recalculate timeline position based on x position using configurable Yale wealth bar
+          const yaleConfig = this.getYaleWealthBarConfig();
+          const timelineWidth = yaleConfig.widthInPixels;
+          const previewPadding = 20;
+          const adjustedX = Math.max(0, x - previewPadding);
+          const timelinePosition = Math.round((adjustedX / timelineWidth) * 100);
+          infobox.timelinePosition = Math.min(100, Math.max(0, timelinePosition));
         }
       }
       
@@ -813,11 +1427,75 @@
         if (confirm('Are you sure you want to clear all infoboxes?')) {
           this.infoboxes = [];
           document.getElementById('preview-container').querySelectorAll('.infobox-preview').forEach(el => el.remove());
+          document.getElementById('preview-container').querySelectorAll('[id^="visual-block-"]').forEach(el => el.remove());
+          document.getElementById('preview-container').querySelectorAll('[id^="media-"]').forEach(el => el.remove());
           this.updateInfoboxList();
           this.updateInfoboxCount();
+          this.updateTimelineScrollbar();
           this.clearForm();
           this.showStatus('All infoboxes cleared');
         }
+      }
+      
+      exportConfig() {
+        const config = {
+          version: '1.0',
+          timestamp: new Date().toISOString(),
+          yaleWealthBar: {
+            endowmentValue: parseFloat(document.getElementById('yale-endowment-value').value),
+            scaleFactor: parseFloat(document.getElementById('scale-factor').value)
+          },
+          infoboxes: this.infoboxes
+        };
+        
+        const configJson = JSON.stringify(config, null, 2);
+        const blob = new Blob([configJson], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `yale-config-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        this.showStatus('Configuration exported successfully');
+      }
+      
+      importConfig(file) {
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const config = JSON.parse(e.target.result);
+            
+            // Validate config structure
+            if (!config.version || !config.infoboxes) {
+              throw new Error('Invalid config file format');
+            }
+            
+            // Import Yale wealth bar settings
+            if (config.yaleWealthBar) {
+              document.getElementById('yale-endowment-value').value = config.yaleWealthBar.endowmentValue || 40.7;
+              document.getElementById('scale-factor').value = config.yaleWealthBar.scaleFactor || 1;
+              this.updateYaleWealthBar();
+            }
+            
+            // Import infoboxes
+            this.infoboxes = config.infoboxes || [];
+            this.updateInfoboxList();
+            this.updateInfoboxCount();
+            this.renderAllInfoboxes();
+            this.updateTimelineScrollbar();
+            
+            this.showStatus(`Configuration imported successfully: ${this.infoboxes.length} infoboxes loaded`);
+          } catch (error) {
+            this.showStatus(`Error importing config: ${error.message}`, 'error');
+          }
+        };
+        reader.readAsText(file);
       }
       
       exportHTML() {
@@ -959,6 +1637,88 @@
       
       updateInfoboxCount() {
         document.getElementById('infobox-count').textContent = this.infoboxes.length;
+        this.updateTimelineScrollbar();
+      }
+      
+      renderAllInfoboxes() {
+        // Clear existing infoboxes from preview
+        document.getElementById('preview-container').querySelectorAll('.infobox-preview').forEach(el => el.remove());
+        document.getElementById('preview-container').querySelectorAll('[id^="visual-block-"]').forEach(el => el.remove());
+        document.getElementById('preview-container').querySelectorAll('[id^="media-"]').forEach(el => el.remove());
+        
+        // Render all infoboxes
+        this.infoboxes.forEach(infobox => {
+          this.renderInfobox(infobox);
+        });
+      }
+      
+      updateTimelineScrollbar() {
+        const timelineBar = document.getElementById('timeline-bar');
+        if (!timelineBar) return;
+        
+        // Remove existing markers
+        timelineBar.innerHTML = '';
+        
+        // Add markers for each infobox
+        this.infoboxes.forEach(infobox => {
+          const marker = document.createElement('div');
+          marker.className = 'timeline-marker';
+          
+          // Calculate position based on timeline percentage and timeline bar width
+          const barWidth = timelineBar.offsetWidth;
+          const markerPosition = (infobox.timelinePosition / 100) * barWidth;
+          marker.style.left = `${markerPosition}px`;
+          marker.title = `${infobox.title} (${infobox.timelinePosition}%)`;
+          
+          // Add click handler to select infobox and scroll to it
+          marker.addEventListener('click', () => {
+            this.selectInfobox(infobox);
+            this.scrollToInfobox(infobox);
+          });
+          
+          timelineBar.appendChild(marker);
+        });
+        
+        // Debug: log marker creation and positioning
+        console.log(`Created ${this.infoboxes.length} timeline markers`);
+        console.log('Timeline bar width:', timelineBar.offsetWidth);
+      }
+      
+      scrollToInfobox(infobox) {
+        const previewArea = document.querySelector('.preview-area');
+        const previewContainer = document.getElementById('preview-container');
+        
+        // Find the infobox element in the preview
+        let infoboxElement = null;
+        
+        if (infobox.type === 'text') {
+          infoboxElement = previewContainer.querySelector(`[data-infobox-id="${infobox.id}"]`);
+        } else if (infobox.type === 'block') {
+          infoboxElement = previewContainer.querySelector(`#visual-block-${infobox.id}`);
+        } else if (infobox.type === 'media') {
+          infoboxElement = previewContainer.querySelector(`#media-${infobox.id}`);
+        }
+        
+        if (infoboxElement) {
+          // Calculate the scroll position to center the infobox
+          const previewRect = previewArea.getBoundingClientRect();
+          const infoboxRect = infoboxElement.getBoundingClientRect();
+          
+          // Calculate the target scroll position
+          const targetScrollLeft = previewArea.scrollLeft + (infoboxRect.left - previewRect.left) - (previewRect.width / 2) + (infoboxRect.width / 2);
+          
+          // Smooth scroll to the infobox
+          previewArea.scrollTo({
+            left: targetScrollLeft,
+            behavior: 'smooth'
+          });
+          
+          // Add a brief highlight effect
+          infoboxElement.style.boxShadow = '0 0 10px rgba(25, 118, 210, 0.8)';
+          setTimeout(() => {
+            infoboxElement.style.boxShadow = '';
+          }, 2000);
+        }
       }
       
       showStatus(message, type = 'info') {
@@ -970,17 +1730,6 @@
     
     // Initialize the configurator
     const configurator = new InfoboxConfigurator();
-    
-    // Auto-scroll to 2/3 position when page loads
-    window.addEventListener('load', () => {
-      const previewArea = document.querySelector('.preview-area');
-      if (previewArea) {
-        const scrollWidth = previewArea.scrollWidth;
-        const clientWidth = previewArea.clientWidth;
-        const scrollTo = (scrollWidth - clientWidth) * 0.67; // 2/3 position
-        previewArea.scrollLeft = scrollTo;
-      }
-    });
   </script>
 </body>
 </html>
