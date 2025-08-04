@@ -77,10 +77,19 @@ body,
 html,
 .wealth-wrapper-outer,
 .wealth-row {
-  min-height: 100%;
+  min-height: 100vh;
   width: 100%;
 }
 
+/* ===== GLOBAL LINK STYLES ===== */
+a {
+  color: #ba0c2f;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
 
 /* ===== LAYOUT CONTAINERS ===== */
 .title-screen {
@@ -206,7 +215,7 @@ h1 {
 }
 
 .credits a {
-  color: #ff6900;
+  color: #ba0c2f;
   text-decoration: none;
 }
 
@@ -221,7 +230,7 @@ h1 {
 }
 
 .attribution a {
-  color: #ff6900;
+  color: #ba0c2f;
   text-decoration: none;
 }
 
@@ -834,19 +843,6 @@ h1 {
   line-height: 1.6;
 }
 
-/* Sub-classes for styling */
-.infobox-text {
-  /* Text-only infobox styling */
-}
-
-.infobox-block {
-  /* Block/chart infobox styling */
-}
-
-.infobox-chart {
-  /* Chart infobox styling */
-}
-
 /* Content styling */
 .infobox .chart,
 .infobox .piechart,
@@ -1343,7 +1339,8 @@ h1 {
 .key {
   position: absolute;
   top: 350px;
-  width: 170px;
+  left: 0;
+  width: 125px;
   background-image: url(img/scale.1.0.svg);
   background-repeat: no-repeat;
   background-position: 0px 4px;
@@ -1372,7 +1369,6 @@ h1 {
   padding: 8px 12px;
   min-width: 140px;
   background-color: rgba(40, 109, 192, 0.95);
-  border-radius: 4px;
   font-weight: 600;
   font-size: 14px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -1424,7 +1420,6 @@ h1 {
   background-color: blue;
   display: block;
   margin: 10px 0;
-  border-radius: 4px;
 }
 .rent-annual .block {
   width: max(var(--rent-block), 20px);
@@ -1432,7 +1427,6 @@ h1 {
   background-color: #ff4444;
   display: block;
   margin: 10px 0;
-  border-radius: 4px;
 }
 .childcare-annual .block {
   width: max(var(--childcare-block), 20px);
@@ -1440,7 +1434,6 @@ h1 {
   background-color: #ff8800;
   display: block;
   margin: 10px 0;
-  border-radius: 4px;
 }
 .groceries-annual .block {
   width: max(var(--groceries-block), 20px);
@@ -1448,7 +1441,6 @@ h1 {
   background-color: #44aa44;
   display: block;
   margin: 10px 0;
-  border-radius: 4px;
 }
 .transportation-annual .block {
   width: max(var(--transportation-block), 20px);
@@ -1456,7 +1448,6 @@ h1 {
   background-color: #4444ff;
   display: block;
   margin: 10px 0;
-  border-radius: 4px;
 }
 .retirement-annual .block {
   width: max(var(--retirement-block), 20px);
@@ -1464,7 +1455,6 @@ h1 {
   background-color: #8844ff;
   display: block;
   margin: 10px 0;
-  border-radius: 4px;
 }
 .utilities-annual .block {
   width: max(var(--utilities-block), 20px);
@@ -1472,17 +1462,14 @@ h1 {
   background-color: #ffaa44;
   display: block;
   margin: 10px 0;
-  border-radius: 4px;
 }
 
 .annual-total .block {
   width: max(var(--annual-total-block), 30px);
   height: max(var(--annual-total-block), 30px);
   background-color: #ff0000;
-  border: 2px solid #cc0000;
   display: block;
   margin: 10px 0;
-  border-radius: 4px;
 }
 
 .yale-worker-wage .block {
@@ -1492,7 +1479,6 @@ h1 {
   border: 2px solid #008800;
   display: block;
   margin: 10px 0;
-  border-radius: 4px;
 }
 
 .yale-schwarzman .block {
@@ -1995,8 +1981,6 @@ h1 {
   max-width: 400px;
   height: 25px;
   background-color: #ff6900;
-  border: 2px solid #cf2e2e;
-  border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -2005,8 +1989,6 @@ h1 {
   max-width: 400px;
   height: 25px;
   background-color: #ff6900;
-  border: 2px solid #cf2e2e;
-  border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -2015,8 +1997,6 @@ h1 {
   max-width: 300px;
   height: 25px;
   background-color: #ff6900;
-  border: 2px solid #cf2e2e;
-  border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -2025,8 +2005,6 @@ h1 {
   max-width: 500px;
   height: 25px;
   background-color: #ff6900;
-  border: 2px solid #cf2e2e;
-  border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -2217,4 +2195,113 @@ h1 {
 
 .infobox .worldchart .description {
   color: black;
+}
+
+/* ===== YALE VISUAL BLOCKS ===== */
+.yale-visual-block {
+  position: absolute;
+  background-color: #ff6900;
+  z-index: 1001;
+  pointer-events: auto;
+  transition: ease-out 0.3s;
+  cursor: pointer;
+  /* Position above infoboxes */
+  top: 20px;
+  /* Size based on value/1000 - will be set via JavaScript */
+  width: var(--block-size, 20px);
+  height: var(--block-size, 20px);
+  min-width: 6px;
+  min-height: 6px;
+  /* Explicitly remove any inherited border styling */
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.yale-visual-block:hover {
+  transform: scale(1.1);
+  z-index: 1002;
+}
+
+.yale-visual-block::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #ff6900, #cf2e2e);
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.yale-visual-block:hover::before {
+  opacity: 1;
+}
+
+/* Ensure Yale wealth bar can accommodate visual blocks */
+.yale .wealth {
+  position: relative;
+  overflow: visible;
+}
+
+/* Mobile adjustments for visual blocks */
+@media (max-width: 450px) {
+  .yale-visual-block {
+    min-width: 6px;
+    min-height: 6px;
+    top: 10px;
+  }
+  
+  .yale-visual-block:hover {
+    transform: scale(1.05);
+  }
+}
+
+/* ===== END YALE VISUAL BLOCKS ===== */
+
+/* ===== YALE COUNTER STYLING ===== */
+#yale-counter {
+  position: fixed;
+  top: calc(50vh + 5px); /* Position right below the Yale ruler (which is ~50vh) with 10px gap */
+  left: 20px;
+  background-color: transparent;
+  color: #0066cc;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  z-index: 1000;
+  box-shadow: none;
+  border: none;
+  display: none; /* Hidden by default, shown via JavaScript */
+  min-width: 200px;
+  text-align: left;
+  pointer-events: none; /* Don't interfere with scrolling */
+}
+
+#yale-counter::before {
+  content: 'Current Value: ';
+  font-size: 14px;
+  opacity: 0.8;
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* Ensure Yale wealth bar has proper positioning for counter */
+.yale .wealth {
+  position: relative;
+}
+
+/* Mobile adjustments for counter */
+@media (max-width: 450px) {
+  #yale-counter {
+    bottom: 100px; /* Adjust for mobile */
+    left: 10px;
+    right: auto;
+    transform: none;
+    font-size: 16px;
+    min-width: auto;
+  }
 }

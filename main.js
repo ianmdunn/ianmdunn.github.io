@@ -1,8 +1,8 @@
 try {
 
-  const yale = document.getElementById('yale');
-const yaleCounter = document.getElementById('yale-counter');
-const yaleCounterStart = document.getElementById('yale-counter-start');
+  let yale = null;
+  let yaleCounter = null;
+  let yaleCounterStart = null;
 
 const babies = document.getElementById('babies-wrapper');
 const babyCounter = document.getElementById('baby-counter');
@@ -15,6 +15,31 @@ const money = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 0,
 });
 let additionalInstructionsShown = false;
+
+// Function to get Yale element with fallback
+function getYaleElement() {
+  if (!yale) {
+    yale = document.getElementById('yale');
+    console.log('Getting Yale element:', !!yale);
+  }
+  return yale;
+}
+
+// Function to get Yale counter with fallback
+function getYaleCounter() {
+  if (!yaleCounter) {
+    yaleCounter = document.getElementById('yale-counter');
+  }
+  return yaleCounter;
+}
+
+// Function to get Yale counter start with fallback
+function getYaleCounterStart() {
+  if (!yaleCounterStart) {
+    yaleCounterStart = document.getElementById('yale-counter-start');
+  }
+  return yaleCounterStart;
+}
 
 function detectConfusedUser(e, timer) {
   if (!additionalInstructionsShown) {
@@ -45,12 +70,35 @@ if (window.innerWidth > 450) {
 window.addEventListener('scroll', function(){
   updateWealthCounter();
   updateInfoboxFlow();
+  initializeVisibleBlocks(); // Ensure all visible blocks are properly initialized
 });
+
+// Track manual scroll position for horizontal scrolling
+let manualScrollPosition = 0;
 
 // Also listen for horizontal scroll specifically
 window.addEventListener('wheel', function(e) {
+  // Accumulate horizontal scroll position
+  if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+    manualScrollPosition += e.deltaX;
+    console.log('Manual scroll position:', manualScrollPosition, 'deltaX:', e.deltaX);
+  }
+  
+  updateWealthCounter(); // Always update counter on wheel events
   if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
     updateInfoboxFlow();
+  }
+});
+
+// Add touch events for mobile
+window.addEventListener('touchmove', function(e) {
+  updateWealthCounter();
+});
+
+// Add keyboard events for arrow keys
+window.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+    updateWealthCounter();
   }
 });
 
@@ -63,43 +111,59 @@ if (babies && babyCounter) {
   });
 }
 
+// Track previous scroll position for direction detection
+let previousScrollPosition = 0;
+
 function updateWealthCounter() {
-  if (yale && yaleCounter && yaleCounterStart) {
-    if (yaleViewable()) {
-      if (yaleCounterViewable()) {
-        // Calculate position within Yale wealth box
-        const yaleStart = yale.offsetLeft;
-        const yaleEnd = yaleStart + yale.offsetWidth;
-        const currentScroll = window.scrollX;
-        
-        // Only calculate wealth when inside the Yale wealth box
-        if (currentScroll >= yaleStart && currentScroll <= yaleEnd) {
-          // Calculate percentage through the Yale wealth box
-          const progress = (currentScroll - yaleStart) / yale.offsetWidth;
-          // Calculate wealth based on percentage of $40.7 billion
-          const wealth = progress * 40700000000;
-          yaleCounter.innerHTML = money.format(wealth);
-        } else if (currentScroll < yaleStart) {
-          // Before reaching Yale wealth box
-          yaleCounter.innerHTML = "$0";
-        } else {
-          // Past Yale wealth box
-          yaleCounter.innerHTML = "$40,700,000,000";
-        }
-      } else {
-        yaleCounter.innerHTML = '';
+  const yaleElement = getYaleElement();
+  const yaleCounterElement = getYaleCounter();
+
+  if (yaleElement && yaleCounterElement) {
+    // Get the Yale element's position relative to the viewport
+    const yaleRect = yaleElement.getBoundingClientRect();
+    const yaleLeft = yaleRect.left;
+    
+    // Show counter when the Yale element is at or past the left edge of the viewport
+    const shouldShow = yaleLeft <= 0;
+    const wasVisible = yaleCounterElement.style.display === 'block';
+    
+    if (shouldShow && !wasVisible) {
+      // Show counter
+      yaleCounterElement.style.display = 'block';
+      console.log('Counter first appeared at:', {
+        yaleLeft: yaleLeft.toFixed(2),
+        screenWidth: window.innerWidth,
+        scrollLeft: document.body.scrollLeft
+      });
+    } else if (!shouldShow && wasVisible) {
+      // Hide counter when before the Yale wealth bar start
+      yaleCounterElement.style.display = 'none';
+    }
+    
+    // Always update the value when counter is visible
+    if (shouldShow) {
+      // Calculate wealth based on how much of the Yale element has passed the left edge
+      // When yaleLeft is 0, we're at the start (should be $0)
+      // When yaleLeft is -yaleWidth, we're at the end (should be $40.7B)
+      const yaleWidth = yaleElement.offsetWidth;
+      const progress = Math.max(0, Math.min(1, -yaleLeft / yaleWidth));
+      
+      // Calculate wealth: $0 at Yale start, $40.7B at Yale end
+      const wealth = progress * 40700000000;
+      yaleCounterElement.innerHTML = money.format(wealth);
+      
+      // Log when counter value changes significantly
+      if (Math.abs(wealth - (previousWealth || 0)) > 1000000) {
+        console.log('Counter updated:', money.format(wealth), 'progress:', progress.toFixed(4));
+        previousWealth = wealth;
       }
     }
   }
-  
-  function yaleViewable() {
-    return yale && window.scrollX < yale.offsetLeft + yale.offsetWidth + 100;
-  }
-  
-  function yaleCounterViewable() {
-    return yaleCounterStart && yaleCounterStart.offsetLeft - window.scrollX < (window.innerWidth);
-  }
 }
+
+// Track previous wealth value for logging
+let previousWealth = 0;
+
 function toggleZoom() {
   const lineChart = document.getElementById('line-chart');
   if (lineChart) {
@@ -373,24 +437,201 @@ const infoboxObjects = [
     trigger: 0.95,
     position: { left: 0.95, top: 80 }
   },
-
+  {
+    id: 20,
+    content: "Pay every Yale worker $100,000 per year minimum ($2 billion)",
+    type: "block",
+    trigger: 1.00,
+    position: { left: 1.00, top: 80 },
+    blockValue: 2000000000,
+    blockLabel: "$2B minimum wage"
+  },
+  {
+    id: 21,
+    content: "Build 1,000 affordable housing units ($400 million)",
+    type: "block",
+    trigger: 1.05,
+    position: { left: 1.05, top: 80 },
+    blockValue: 400000000,
+    blockLabel: "$400M housing"
+  },
+  {
+    id: 22,
+    content: "What Yale Could Do for New Haven",
+    type: "text",
+    trigger: 1.10,
+    position: { left: 1.10, top: 80 }
+  },
+  {
+    id: 23,
+    content: "The Reality: What Yale Actually Does",
+    type: "text",
+    trigger: 1.15,
+    position: { left: 1.15, top: 80 }
+  },
+  {
+    id: 24,
+    content: "<strong>Yale's endowment grew by $1.4 billion in 2023 alone.</strong> That's enough money to give every Yale worker a $175,000 bonus. Instead, workers are told there's \"no money\" for raises, benefits, or better working conditions.",
+    type: "text",
+    trigger: 1.20,
+    position: { left: 1.20, top: 80 }
+  },
+  {
+    id: 25,
+    content: "<strong>New Haven's Reality:</strong> While Yale's endowment grew by $1.4 billion in 2023, New Haven faces a $15 million budget deficit. The city struggles to fund schools, maintain infrastructure, and provide services, while Yale pays less than 0.02% of its endowment in taxes to the city.",
+    type: "text",
+    trigger: 1.25,
+    position: { left: 1.25, top: 80 }
+  },
+  {
+    id: 26,
+    content: "<strong>New Haven's Cost of Living:</strong> According to PayScale, New Haven's cost of living is 8% higher than the national average. Housing costs are 2% higher, utilities are 42% higher, and transportation is 7% higher than the national average.",
+    type: "text",
+    trigger: 1.30,
+    position: { left: 1.30, top: 80 }
+  },
+  {
+    id: 27,
+    content: "Yale's 2023 endowment growth ($1.4 billion)",
+    type: "block",
+    trigger: 1.35,
+    position: { left: 1.35, top: 80 },
+    blockValue: 1400000000,
+    blockLabel: "$1.4B growth"
+  },
+  {
+    id: 28,
+    content: "New Haven's budget deficit ($15 million)",
+    type: "block",
+    trigger: 1.40,
+    position: { left: 1.40, top: 80 },
+    blockValue: 15000000,
+    blockLabel: "$15M deficit"
+  },
+  {
+    id: 29,
+    content: "Yale's annual tax contribution to New Haven ($8 million)",
+    type: "block",
+    trigger: 1.45,
+    position: { left: 1.45, top: 80 },
+    blockValue: 8000000,
+    blockLabel: "$8M taxes"
+  },
+  {
+    id: 30,
+    content: "What Yale workers actually get: average annual raise ($2,000)",
+    type: "block",
+    trigger: 1.50,
+    position: { left: 1.50, top: 80 },
+    blockValue: 2000,
+    blockLabel: "$2K raise"
+  },
+  {
+    id: 31,
+    content: "What Yale could give each worker as bonus ($175,000)",
+    type: "block",
+    trigger: 1.55,
+    position: { left: 1.55, top: 80 },
+    blockValue: 175000,
+    blockLabel: "$175K bonus"
+  },
+  {
+    id: 32,
+    content: "Yale's annual spending on administration ($500 million)",
+    type: "block",
+    trigger: 1.60,
+    position: { left: 1.60, top: 80 },
+    blockValue: 500000000,
+    blockLabel: "$500M admin"
+  },
+  {
+    id: 33,
+    content: "Yale's annual spending on student financial aid ($200 million)",
+    type: "block",
+    trigger: 1.65,
+    position: { left: 1.65, top: 80 },
+    blockValue: 200000000,
+    blockLabel: "$200M aid"
+  },
+  {
+    id: 34,
+    content: "Yale's annual spending on faculty salaries ($300 million)",
+    type: "block",
+    trigger: 1.70,
+    position: { left: 1.70, top: 80 },
+    blockValue: 300000000,
+    blockLabel: "$300M faculty"
+  },
+  {
+    id: 35,
+    content: "Yale's annual spending on facilities maintenance ($150 million)",
+    type: "block",
+    trigger: 1.75,
+    position: { left: 1.75, top: 80 },
+    blockValue: 150000000,
+    blockLabel: "$150M facilities"
+  },
+  {
+    id: 36,
+    content: "Yale's annual spending on research ($1 billion)",
+    type: "block",
+    trigger: 1.80,
+    position: { left: 1.80, top: 80 },
+    blockValue: 1000000000,
+    blockLabel: "$1B research"
+  },
+  {
+    id: 37,
+    content: "Yale's annual spending on student services ($100 million)",
+    type: "block",
+    trigger: 1.85,
+    position: { left: 1.85, top: 80 },
+    blockValue: 100000000,
+    blockLabel: "$100M services"
+  },
+  {
+    id: 38,
+    content: "Yale's annual spending on library and technology ($80 million)",
+    type: "block",
+    trigger: 1.90,
+    position: { left: 1.90, top: 80 },
+    blockValue: 80000000,
+    blockLabel: "$80M library/tech"
+  },
+  {
+    id: 39,
+    content: "Yale's annual spending on athletics ($50 million)",
+    type: "block",
+    trigger: 1.95,
+    position: { left: 1.95, top: 80 },
+    blockValue: 50000000,
+    blockLabel: "$50M athletics"
+  },
+  {
+    id: 40,
+    content: "Yale's annual spending on dining and housing ($120 million)",
+    type: "block",
+    trigger: 2.00,
+    position: { left: 2.00, top: 80 },
+    blockValue: 120000000,
+    blockLabel: "$120M dining/housing"
+  }
 ];
 
 // Helper function to compute scroll progress
 function computeScrollProgress() {
-  if (!yale) {
+  const yaleElement = getYaleElement();
+  if (!yaleElement) {
     return null;
   }
   
   const totalScroll = document.body.scrollLeft;
-  const yaleStart = yale.offsetLeft;
-  const yaleWidth = yale.offsetWidth;
+  const yaleStart = yaleElement.offsetLeft;
+  const yaleWidth = yaleElement.offsetWidth;
   
-  // Calculate scroll position relative to Yale section start
-  const relativeScroll = Math.max(0, totalScroll - yaleStart);
+  // Calculate scroll position relative to Yale section start (allow negative values for backwards scrolling)
+  const relativeScroll = totalScroll - yaleStart;
   const progress = relativeScroll / yaleWidth;
-  
-
   
   return {
     progress,
@@ -420,7 +661,7 @@ function updateInfoboxFlow() {
         // Check if infobox state should change
         const wasVisible = element.style.display === 'block';
         
-        if (shouldShow) {
+        if (shouldShow && !wasVisible) {
           // Show and position the infobox
           element.style.setProperty('display', 'block', 'important');
           element.style.setProperty('position', 'fixed', 'important');
@@ -442,23 +683,43 @@ function updateInfoboxFlow() {
           element.style.setProperty('top', `${yPosition}px`, 'important');
           
           // Create and show visual block if this infobox has block data
-          // Only create dynamic blocks for later infoboxes (after 20) since early ones have static HTML blocks
-          if (infobox.blockValue && infobox.id > 20) {
+          if (infobox.blockValue) {
+            console.log('Should create block for infobox', infobox.id, 'with value', infobox.blockValue);
             createVisualBlock(infobox);
           }
-        } else {
+        } else if (!shouldShow && wasVisible) {
           // Hide infobox when outside its range
           element.style.setProperty('display', 'none', 'important');
           
           // Hide visual block if this infobox has block data
-          // Only hide dynamic blocks for later infoboxes (after 20) since early ones have static HTML blocks
-          if (infobox.blockValue && infobox.id > 20) {
+          if (infobox.blockValue) {
             hideVisualBlock(infobox.id);
           }
         }
       }
     });
+}
 
+// Function to initialize all visual blocks that should be visible based on current scroll position
+function initializeVisibleBlocks() {
+  const scrollData = computeScrollProgress();
+  if (!scrollData) return;
+  
+  const { progress } = scrollData;
+  console.log('Initializing visible blocks for progress:', progress);
+  
+  infoboxObjects.forEach((infobox) => {
+    if (infobox.blockValue) {
+      const infoboxStart = infobox.trigger;
+      const infoboxEnd = infobox.trigger + 0.03;
+      const shouldBeVisible = progress >= infoboxStart && progress < infoboxEnd;
+      
+      if (shouldBeVisible) {
+        console.log('Initializing block for infobox', infobox.id, 'at progress', progress);
+        createVisualBlock(infobox);
+      }
+    }
+  });
 }
 
 // Function to create visual blocks on the Yale wealth bar
@@ -466,49 +727,146 @@ function createVisualBlock(infobox) {
   // Remove any existing block for this infobox
   hideVisualBlock(infobox.id);
   
-  // Get Yale bar height to constrain the block
-  const yaleHeight = yale.offsetHeight || 400; // Default to 400px if not available
-  const maxBlockSize = yaleHeight * 0.8; // Use 80% of Yale height as max
+  const yaleElement = getYaleElement();
+  if (!infobox.blockValue || !yaleElement) {
+    console.log('createVisualBlock: Missing blockValue or yale element', { 
+      blockValue: infobox.blockValue, 
+      yaleExists: !!yaleElement,
+      infoboxId: infobox.id 
+    });
+    return;
+  }
   
-  // Calculate block size based on AREA (square pixels), not linear dimension
-  const blockValue = infobox.blockValue;
-  const areaInPixels = blockValue / 1000; // $1000 = 1 square pixel
-  const blockSize = Math.min(Math.sqrt(areaInPixels), maxBlockSize); // Square root for area-based sizing
+  console.log('Creating visual block for infobox', infobox.id, 'with value', infobox.blockValue);
+  
+  // Calculate area based on value/1000 where 1 square pixel = $1,000
+  // This creates a proportional representation where area = value/1000
+  const totalArea = infobox.blockValue / 1000; // Total square pixels needed
+  const minSize = 6; // Minimum dimension for visibility
+  
+  // Calculate dimensions for a square block
+  // For square blocks: width = height = sqrt(area)
+  const blockSize = Math.max(Math.sqrt(totalArea), minSize);
+  
+  console.log('Block area calculation:', { 
+    blockValue: infobox.blockValue, 
+    totalArea: totalArea,
+    blockSize: blockSize,
+    calculation: `sqrt(${infobox.blockValue} / 1000) = sqrt(${totalArea}) = ${blockSize}px`
+  });
   
   // Create the visual block
   const block = document.createElement('div');
   block.id = `visual-block-${infobox.id}`;
   block.className = 'yale-visual-block';
+  
+  // Always offset text from blocks and add arrows for better visibility
+  const needsOffset = true; // Always offset for better visibility
+  const offsetDistance = 80; // 80px offset for all blocks
+  
+  // Calculate the center of the infobox's visibility span
+  const infoboxStart = infobox.trigger;
+  const infoboxEnd = infobox.trigger + 0.03; // 3% range
+  const infoboxCenter = infoboxStart + (infoboxEnd - infoboxStart) / 2;
+  
+  // Position the block at the center of the infobox span
+  const leftPosition = infoboxCenter * 100;
+  
   block.style.cssText = `
     position: absolute;
-    left: ${infobox.position.left * 100}%;
-    bottom: 0;
+    left: ${leftPosition}%;
+    top: ${20 + offsetDistance}px;
     width: ${blockSize}px;
     height: ${blockSize}px;
     background-color: #ff6900;
-    border: 2px solid #cf2e2e;
     z-index: 1001;
-    pointer-events: none;
+    pointer-events: auto;
+    transition: all 0.3s ease;
   `;
   
-  // Add label
+  // Add label with offset positioning
   const label = document.createElement('div');
+  const labelTop = -45; // Further up from the block
+  const labelLeft = '50%';
+  
   label.style.cssText = `
     position: absolute;
-    top: -30px;
-    left: 0;
-    background-color: rgba(0, 0, 0, 0.8);
+    top: ${labelTop}px;
+    left: ${labelLeft};
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.9);
     color: white;
-    padding: 4px 8px;
-    font-size: 12px;
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 600;
     white-space: nowrap;
     border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    z-index: 1002;
   `;
   label.textContent = infobox.blockLabel;
   block.appendChild(label);
   
+  // Add arrow for all blocks
+  const arrow = document.createElement('div');
+  arrow.style.cssText = `
+    position: absolute;
+    top: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 16px solid rgba(0, 0, 0, 0.9);
+    z-index: 1001;
+  `;
+  block.appendChild(arrow);
+  
+  // Add value display on the block only if block is large enough (minimum 20px)
+  if (blockSize >= 20) {
+    const valueDisplay = document.createElement('div');
+    valueDisplay.style.cssText = `
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      text-align: center;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+      z-index: 1003;
+    `;
+    
+    // Format the value for display
+    const formatValue = (value) => {
+      if (value >= 1000000) {
+        return `$${(value / 1000000).toFixed(1)}M`;
+      } else if (value >= 1000) {
+        return `$${(value / 1000).toFixed(0)}K`;
+      } else {
+        return `$${value.toLocaleString()}`;
+      }
+    };
+    
+    valueDisplay.textContent = formatValue(infobox.blockValue);
+    block.appendChild(valueDisplay);
+  }
+  
   // Add to Yale wealth bar
-  yale.appendChild(block);
+  yaleElement.appendChild(block);
+  
+  console.log('Visual block created and added to Yale element', block.id);
+  
+  // Add hover effect
+  block.addEventListener('mouseenter', () => {
+    block.style.transform = 'scale(1.1)';
+  });
+  
+  block.addEventListener('mouseleave', () => {
+    block.style.transform = 'scale(1)';
+  });
 }
 
 // Function to hide visual blocks
@@ -521,11 +879,27 @@ function hideVisualBlock(infoboxId) {
 
 // Start the growth bar when page loads
 document.addEventListener('DOMContentLoaded', function() {
+  // Initialize Yale elements
+  const yaleElement = getYaleElement();
+  const yaleCounterElement = getYaleCounter();
+  const yaleCounterStartElement = getYaleCounterStart();
+  
+  console.log('DOMContentLoaded: Yale elements initialized:', {
+    yale: !!yaleElement,
+    yaleCounter: !!yaleCounterElement,
+    yaleCounterStart: !!yaleCounterStartElement
+  });
+  
+  // Initialize counter with proper styling
+  if (yaleCounterElement) {
+    console.log('Initializing counter...');
+    yaleCounterElement.style.display = 'none'; // Hidden by default
+    yaleCounterElement.innerHTML = '$0';
+  }
+  
   initGrowthBar();
-  
-  
-  
-  
+  initializeVisibleBlocks(); // Initialize visible blocks on page load
+  updateWealthCounter(); // Initialize counter on page load
 });
 
 } catch (error) {
