@@ -1,19 +1,128 @@
+/* ===== GLOBAL VARIABLES ===== */
+:root {
+  /* Yale Endowment: $40.7 billion */
+  --yale-endowment-billions: 40.7;
+  
+  /* Yale wealth box dimensions (base reference) */
+  --yale-width: 101750px;
+  --yale-height: 400px;
+  
+  /* Scale: 1 pixel = $1,000 (canonical) */
+  --scale-ratio: 1000;
+  
+  /* Calculate other wealth boxes relative to Yale area */
+  --yale-area: calc(var(--yale-width) * var(--yale-height));
+  --one-thousand-width: calc(var(--yale-width) * 1000 / 40700000000);
+  --median-wage-width: calc(var(--yale-width) * 72000 / 40700000000);
+  --million-width: calc(var(--yale-width) * 1000000 / 40700000000);
+  --billion-width: calc(var(--yale-width) * 1000000000 / 40700000000);
+  
+  /* Infobox positioning relative to Yale width - systematic horizontal spacing */
+  --infobox-spacing: calc(var(--yale-width) * 0.08);
+  --infobox-first-position: calc(var(--yale-width) * 0.05);
+  --infobox-second-position: calc(var(--yale-width) * 0.13);
+  --infobox-third-position: calc(var(--yale-width) * 0.21);
+  --infobox-fourth-position: calc(var(--yale-width) * 0.29);
+  --infobox-fifth-position: calc(var(--yale-width) * 0.37);
+  --infobox-sixth-position: calc(var(--yale-width) * 0.45);
+  --infobox-seventh-position: calc(var(--yale-width) * 0.53);
+  --infobox-eighth-position: calc(var(--yale-width) * 0.61);
+  --infobox-ninth-position: calc(var(--yale-width) * 0.69);
+  --infobox-tenth-position: calc(var(--yale-width) * 0.77);
+  --infobox-eleventh-position: calc(var(--yale-width) * 0.85);
+  --infobox-twelfth-position: calc(var(--yale-width) * 0.93);
+  --infobox-thirteenth-position: calc(var(--yale-width) * 0.05);
+  --infobox-fourteenth-position: calc(var(--yale-width) * 0.13);
+  --infobox-fifteenth-position: calc(var(--yale-width) * 0.21);
+  --infobox-sixteenth-position: calc(var(--yale-width) * 0.29);
+  --infobox-seventeenth-position: calc(var(--yale-width) * 0.37);
+  --infobox-eighteenth-position: calc(var(--yale-width) * 0.45);
+  --infobox-nineteenth-position: calc(var(--yale-width) * 0.53);
+  --infobox-twentieth-position: calc(var(--yale-width) * 0.05);
+  --infobox-twenty-first-position: calc(var(--yale-width) * 0.25);
+  --infobox-twenty-second-position: calc(var(--yale-width) * 0.45);
+  --infobox-twenty-third-position: calc(var(--yale-width) * 0.65);
+  --infobox-twenty-fourth-position: calc(var(--yale-width) * 0.85);
+  
+  /* Vertical spacing for infoboxes */
+  --infobox-vertical-spacing: 200px;
+  --infobox-section-spacing: 300px;
+  
+  /* Block dimensions relative to Yale width (percentage of Yale's width) */
+  --lifetime-block: calc(var(--yale-width) * 0.000047);
+  --rent-block: calc(var(--yale-width) * 0.000046);
+  --childcare-block: calc(var(--yale-width) * 0.000036);
+  --groceries-block: calc(var(--yale-width) * 0.000024);
+  --transportation-block: calc(var(--yale-width) * 0.000018);
+  --retirement-block: calc(var(--yale-width) * 0.000015);
+  --utilities-block: calc(var(--yale-width) * 0.000016);
+  --annual-total-block: calc(var(--yale-width) * 0.000153);
+  --yale-worker-wage-block: calc(var(--yale-width) * 0.00177);
+  --yale-schwarzman-block: calc(var(--yale-width) * 0.0147);
+  --yale-residential-block: calc(var(--yale-width) * 0.0037);
+  --yale-science-block: calc(var(--yale-width) * 0.0049);
+  --yale-campaign-block: calc(var(--yale-width) * 0.172);
+  --yale-worker-bonus-block: calc(var(--yale-width) * 0.0098);
+  --yale-housing-block: calc(var(--yale-width) * 0.0098);
+  --yale-childcare-block: calc(var(--yale-width) * 0.0074);
+  --yale-minimum-wage-block: calc(var(--yale-width) * 0.049);
+  --yale-housing-large-block: calc(var(--yale-width) * 0.0098);
+
+  
+  /* Bar dimensions relative to Yale width */
+  --worker-bonus-bar: calc(var(--yale-width) * 0.006);
+  --worker-housing-bar: calc(var(--yale-width) * 0.006);
+  --worker-childcare-bar: calc(var(--yale-width) * 0.0045);
+  --worker-wage-bar: calc(var(--yale-width) * 0.03);
+  
+  /* Growth bar dimensions - following 1 pixel = $1,000 rule */
+  --growth-bar-width: calc(var(--yale-width) * 0.15);
+  --growth-bar-height: 60px;
+  --growth-wealth-width: calc(var(--yale-width) * 0.2);
+  --growth-wealth-height: var(--yale-height);
+  
+  /* Container height and max block height */
+  --yale-container-height: 300px;
+  --max-block-height: 300px;
+}
+
+/* ===== BASE STYLES ===== */
 body, html {
   margin: 0;
+  padding: 0;
   font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   line-height: 1.6;
   color: #333;
   background-color: #ffffff;
+  overflow-x: auto;
+  overflow-y: auto;
 }
+
 body,
 html,
-.wealth-wrapper-outer
+.wealth-wrapper-outer,
 .wealth-row {
   min-height: 100%;
+  width: 100%;
 }
+
+@media (max-width: 450px) {
+  body, html {
+    overflow-x: hidden;
+  }
+}
+/* ===== LAYOUT CONTAINERS ===== */
 .title-screen {
   width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background-color: #ffffff;
 }
+
 h1 {
   text-align: center;
   font-size: 42px;
@@ -25,7 +134,23 @@ h1 {
   font-weight: 800;
   letter-spacing: -0.02em;
   text-transform: uppercase;
+  max-width: 800px;
+  padding: 0 20px;
 }
+
+@media (max-width: 450px) {
+  h1 {
+    font-size: 28px;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    padding: 0 15px;
+  }
+  
+  .title-screen {
+    min-height: 80vh;
+  }
+}
+/* ===== NAVIGATION & UI ELEMENTS ===== */
 .scroll-this-way {
   align-self: flex-end;
   width: 360px;
@@ -35,24 +160,35 @@ h1 {
   bottom: 0;
   padding-top: 42px;
   padding-left: 48px;
-
   font-size: 30px;
   color: #00000033;
-
   background-image: url(img/right.svg);
   background-repeat: no-repeat;
   background-size: 50%;
   background-position: 50px 40px;
-
   animation-name: bouncy-arrow;
   animation-delay: 0;
   animation-iteration-count: infinite;
   animation-direction: forward;
   animation-duration: 3s;
+  z-index: 5;
+}
+
+@media (max-width: 450px) {
+  .scroll-this-way {
+    right: -35%;
+    width: 300px;
+    height: 120px;
+    font-size: 24px;
+    padding-top: 30px;
+    padding-left: 30px;
+    background-size: 40%;
+    background-position: 30px 25px;
+  }
 }
 .footer {
-  position: absolute;
-  bottom: 40px;
+  position: relative;
+  bottom: 0;
   text-align: center;
   font-size: 14px;
   width: 100%;
@@ -61,6 +197,14 @@ h1 {
   padding: 30px 0;
   border-top: 3px solid #ff6900;
   line-height: 1.5;
+  margin-top: 50px;
+}
+
+@media (max-width: 450px) {
+  .footer {
+    padding: 20px 15px;
+    font-size: 12px;
+  }
 }
 
 .local34-branding {
@@ -99,25 +243,191 @@ h1 {
   text-decoration: underline;
 }
 
-.also {
+.attribution {
   font-size: 12px;
   color: #AAAAAA;
   line-height: 1.4;
 }
 
-.also a {
+.attribution a {
   color: #ff6900;
   text-decoration: none;
 }
 
-.also a:hover {
+.attribution a:hover {
   text-decoration: underline;
 }
-@media (max-width: 450px) {
-  .scroll-this-way {
-    right: -35vw;
+
+/* ===== GROWTH BAR STYLES ===== */
+.growth-title {
+  color: #d32f2f;
+  font-size: 1.8em;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.growth-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+/* Removed old growth-bar-wrapper styles - now using growth-pixel-area */
+
+/* Removed old growth-bar styles - now using pixel-based approach */
+
+.growth-counter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.2em;
+  font-weight: 700;
+  color: #333;
+  text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+  z-index: 10;
+}
+
+.growth-info {
+  font-size: 0.9em;
+  color: #666;
+  line-height: 1.4;
+}
+
+.growth-rate {
+  font-weight: 600;
+  color: #4caf50;
+}
+
+/* ===== GROWTH WEALTH BAR ===== */
+.yale-growth {
+  /* Follow the same pattern as other wealth wrappers */
+  margin: 1em 3em;
+  margin-left: 10px; /* 10px gap from Yale bar */
+  flex-shrink: 0;
+}
+
+.yale-growth .wealth {
+  width: 400px; /* Square area */
+  height: 400px;
+  background: #f5f5f5;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+
+.yale-growth .wealth-title {
+  color: #333;
+  font-size: 1.1em;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.yale-growth .growth-container {
+  width: 95%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.yale-growth .growth-pixel-area {
+  width: 100%;
+  height: 300px;
+  background-color: #f8f8f8;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.growth-pixel {
+  transition: top 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  animation: pixelDrop 0.3s ease-out;
+}
+
+@keyframes pixelDrop {
+  0% { 
+    opacity: 0; 
+    transform: scale(0) rotate(0deg); 
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.2) rotate(180deg); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: scale(1) rotate(360deg); 
   }
 }
+
+/* Removed old yale-growth .growth-bar styles - now using pixel-based approach */
+
+.yale-growth .growth-counter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1em;
+  font-weight: 700;
+  color: #333;
+  text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+  z-index: 10;
+  background: rgba(255,255,255,0.9);
+  padding: 4px 8px;
+  border-radius: 3px;
+}
+
+.yale-growth .growth-info {
+  font-size: 0.7em;
+  color: #666;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.yale-growth .growth-rate {
+  font-weight: 600;
+  color: #e8f5e8;
+}
+
+@media (max-width: 450px) {
+  .yale-growth {
+    position: relative;
+    left: auto;
+    top: auto;
+    margin-top: 20px;
+  }
+  
+  .yale-growth .wealth {
+    width: 80vw;
+    height: 400px;
+  }
+  
+  .yale-growth .growth-pixel-area {
+    height: 300px;
+  }
+  
+  .yale-growth .growth-counter {
+    font-size: 0.9em;
+  }
+  
+  .yale-growth .wealth-title {
+    font-size: 1.2em;
+  }
+}
+
+/* Removed old growth-bar-wrapper mobile styles */
+
 @keyframes bouncy-arrow {
   0% {background-position: 50px 40px;}
   20% {background-position: 50px 40px;}
@@ -127,11 +437,19 @@ h1 {
   40% {background-position: 50px 40px;}
   100% {background-position: 50px 40px;}
 }
+/* ===== WEALTH VISUALIZATION LAYOUT ===== */
 .wealth-wrapper-outer {
   font-family: sans-serif;
-  overflow: visible;
-  display: inline-block;
+  overflow-x: auto;
+  overflow-y: auto;
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  /* Extend viewport to accommodate growth bar */
+  min-width: calc(var(--yale-width) + 410px); /* Yale width + 10px gap + 400px growth bar */
 }
+
 .center-sticky {
   position: sticky;
   left: 50%;
@@ -183,126 +501,204 @@ h1 {
 }
 
 
+/* ===== WEALTH BOXES & TITLES ===== */
 .wealth-row {
-  display: inline-flex;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  min-width: max-content;
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: 10px;
 }
+
 .arrow {
   margin-left: -6px;
   margin-top: 5px;
+  flex-shrink: 0;
 }
+
 .wealth-wrapper {
-  margin: 1em 3em;
+  margin: 2em 3em;
+  flex-shrink: 0;
+  position: relative;
+  padding: 0 15px;
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
+
 .wealth {
   background-color: black;
   align-items: center;
   display: flex;
+  position: relative;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
 }
+
 .title {
   margin-bottom: 5px;
 }
+
 .billion .wealth > .wealth-title {
-  flex-basis: 110px;
+  flex-basis: auto;
   position: static;
+  text-align: left;
+  padding: 8px 12px;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
-.four-hundred .wealth > .wealth-title {
-  flex-basis: 420px;
-}
-.four-hundred .infobox.intro {
-  margin-left: 0;
-  position: relative;
-  width: auto;
-  width: 10000px;
-}
-.wealth > .wealth-title {
-  flex-basis: 1%;
-  padding: 10px;
+
+.wealth-title {
+  padding: 8px 0;
   color: black;
+  white-space: normal;
+  margin: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 300px;
+  line-height: 1.4;
+  text-align: left;
+  align-self: flex-start;
 }
+
 @media (max-width: 450px) {
   .wealth-title {
-    font-size: 19px;
+    font-size: 16px;
+    max-width: 200px;
+    padding: 8px 12px;
+    margin: 0;
+  }
+  
+  .wealth-wrapper {
+    margin: 1em 1.5em;
+    padding: 0 10px;
+  }
+  
+  .wealth.one-thousand {
+    min-width: 60px;
+  }
+  
+  .wealth.median-wage {
+    min-width: 100px;
+  }
+  
+  .wealth.million {
+    min-width: 120px;
+  }
+  
+  .wealth.billion {
+    min-width: 150px;
   }
 }
+
 .wealth-title {
-  align-self: flex-start;
-  position: sticky;
-  left: 0;
-  margin-bottom: 15px;
+  position: relative;
   color: black;
-  margin-top: 0;
+  margin: 0;
   font-size: 18px;
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 1.4;
+  z-index: 10;
+  padding: 8px 0;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 300px;
+  text-align: left;
+  align-self: flex-start;
 }
+
 .text-infobox .title,
 .infobox .chart {
   max-width: 500px;
   font-size: 16px;
   line-height: 1.6;
 }
+
 .infobox .chart img {
   max-width: 100%;
+  height: auto;
 }
+
+/* ===== INFOBOX CONTENT STYLING ===== */
 .infobox .chart,
-.infobox .title-square-wrapper,
+.infobox .title-block-wrapper,
 .infobox .title {
   font-weight: normal;
   line-height: 1.6;
   width: 96vw;
-  max-width: 600px;
-  font-size: 16px;
+  max-width: 1000px;
+  font-size: 18px;
   color: black;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Yale section specific overrides */
 .yale .infobox .title {
   color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .yale .infobox .chart {
   color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
-.yale .infobox .title-square-wrapper {
+.yale .infobox .title-block-wrapper {
   color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .yale .infobox p {
   color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .yale .infobox li {
   color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .yale .infobox strong {
   color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .yale .what-could-we-do.title {
   color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .yale .yale-endowment-bar .title {
   color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .yale .benefit .title {
   color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
-.yale .infobox .title-square-wrapper .title {
+.yale .infobox .title-block-wrapper .title {
   color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 /* Make Yale wealth titles white */
 .yale .wealth-title {
   color: white;
+  background-color: rgba(40, 109, 192, 0.9);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .yale .wealth > .wealth-title {
   color: white;
+  background-color: rgba(40, 109, 192, 0.9);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 /* Target all infoboxes that are children of the yale wealth wrapper */
@@ -310,51 +706,58 @@ h1 {
 .yale .infobox p,
 .yale .infobox li,
 .yale .infobox strong,
-.yale .infobox .title-square-wrapper,
+.yale .infobox .title-block-wrapper,
 .yale .infobox .chart,
 .yale .infobox .midtext {
   color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 /* Ensure all other sections have black text */
 .one-thousand .infobox .title,
-.median .infobox .title,
+.median-wage .infobox .title,
 .million .infobox .title,
 .billion .infobox .title,
-.four-hundred .infobox .title {
-  color: black;
-}
 
 .one-thousand .infobox p,
-.median .infobox p,
+.median-wage .infobox p,
 .million .infobox p,
 .billion .infobox p,
-.four-hundred .infobox p {
-  color: black;
-}
-
 .one-thousand .infobox li,
-.median .infobox li,
+.median-wage .infobox li,
 .million .infobox li,
 .billion .infobox li,
-.four-hundred .infobox li {
-  color: black;
-}
-
 .one-thousand .infobox strong,
-.median .infobox strong,
+.median-wage .infobox strong,
 .million .infobox strong,
 .billion .infobox strong {
   color: #cf2e2e;
+  text-shadow: none;
 }
 
-.four-hundred .infobox strong {
-  color: #cf2e2e;
-}
 @media (max-width: 450px) {
   .infobox .midtext,
   .infobox .title {
-    width: 90vw;
+    width: 90%;
+    font-size: 16px;
+  }
+  
+  .wealth-row {
+    flex-direction: column;
+    overflow-x: visible;
+    overflow-y: visible;
+    gap: 15px;
+  }
+  
+  .wealth-wrapper {
+    margin: 0.5em 1em;
+    margin-bottom: 10px;
+  }
+  
+  .yale .wealth {
+    width: 100vw;
+    max-width: 100vw;
+    overflow-x: auto;
   }
 }
 .infobox.year-veteran .title {
@@ -366,62 +769,508 @@ h1 {
 .infobox .worldchart,
 .infobox .chart-outer,
 .infobox .midtext,
-.infobox .title-square-wrapper,
+.infobox .title-block-wrapper,
 .text-infobox .title {
-  position: sticky;
-  left: 50%;
-  transform: translate(-50%);
+  position: relative;
+  left: 0;
+  transform: none;
+  max-width: 100%;
+  overflow: hidden;
+  /* Prevent text overlap */
+  z-index: 1;
 }
+
 @media (max-width: 450px) {
   .infobox.line-chart .chart-outer {
     left: 5px;
-    width: 98vw;
+    width: 98%;
+    transform: none;
   }
-  .infobox .square,
-  .infobox .title-square-wrapper,
+  
+  .infobox .block,
+  .infobox .title-block-wrapper,
   .infobox .piechart,
   .infobox .chart-outer,
   .infobox .midtext,
   .infobox .title {
     left: 10px;
     transform: none;
+    position: relative;
+    max-width: calc(100vw - 20px);
+  }
+  
+  .infobox .chart,
+  .infobox .piechart,
+  .infobox .worldchart,
+  .infobox .chart-outer,
+  .infobox .midtext,
+  .infobox .title-block-wrapper,
+  .text-infobox .title {
+    position: relative;
+    left: 0;
+    transform: none;
+    max-width: 100%;
   }
 }
-.sub-infobox .square,
+
+.sub-infobox .block,
 .sub-infobox .midtext,
 .sub-infobox .title {
   position: static;
 }
+/* ===== INFOBOX LAYOUT & POSITIONING ===== */
+/* ===== UNIFIED INFOBOX SYSTEM ===== */
+/* Base infobox styles */
 .infobox {
+  z-index: 10;
+  position: absolute;
+  width: 90vw;
+  max-width: 1000px;
+  margin-bottom: var(--infobox-vertical-spacing);
+  max-height: 300px;
+  padding: 20px;
+  background-color: transparent;
+  border-radius: 0;
+  overflow: hidden;
+  display: none;
+  pointer-events: none;
+  color: white;
+}
+
+/* Only show infoboxes within Yale section */
+.yale .infobox {
+  display: none;
+  color: white;
+  border: none;
+  pointer-events: auto;
+}
+
+/* Hide infoboxes outside of Yale section */
+.one-thousand .infobox,
+.median-wage .infobox,
+.million .infobox,
+.billion .infobox {
+  display: none;
+}
+
+/* Infobox positioning will be handled by JavaScript */
+.yale .infobox {
+  position: fixed !important;
+  display: none !important;
+  color: white !important;
+  border: none !important;
+  pointer-events: auto !important;
+  z-index: 1000 !important;
+  width: 90vw !important;
+  max-width: 1000px !important;
+  max-height: 300px !important;
+  padding: 20px !important;
+  background-color: transparent !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+}
+
+/* Sub-classes for styling */
+.infobox-text {
+  /* Text-only infobox styling */
+}
+
+.infobox-block {
+  /* Block/chart infobox styling */
+}
+
+.infobox-chart {
+  /* Chart infobox styling */
+}
+
+/* Content styling */
+.infobox .chart,
+.infobox .piechart,
+.infobox .worldchart,
+.infobox .chart-outer,
+.infobox .midtext,
+.infobox .title-block-wrapper,
+.text-infobox .title {
+  position: relative;
+  left: 0;
+  transform: none;
+  max-width: 100%;
+  overflow: hidden;
   z-index: 1;
-  margin-left: 8000px;
-  width: 15000px;
-  margin-bottom: 30px;
 }
-.four-hundred .infobox {
-  width: 4000px;
+
+@media (max-width: 450px) {
+  .infobox {
+    position: relative;
+    left: 10px !important;
+    width: calc(100vw - 20px);
+    max-width: calc(100vw - 20px);
+    margin-bottom: 20px;
+    top: auto !important;
+    display: block;
+  }
+  
+  .yale .wealth {
+    position: relative;
+    overflow-x: auto;
+  }
+  
+  .yale .infobox {
+    position: relative;
+    left: 10px !important;
+    width: calc(100vw - 20px);
+    max-width: calc(100vw - 20px);
+    margin-bottom: 20px;
+    top: auto !important;
+    display: block;
+  }
 }
+
 .flex {
   display: flex;
 }
+
 .infobox.first {
-  margin-left: 30000px;
+  left: 5vw;
+  top: 80px;
+  background-color: transparent;
 }
+
 .infobox.first .title {
-  max-width: 390px;
+  max-width: 500px;
 }
+
 .infobox.coming-up .title,
 .infobox.five-pixels .title {
-  max-width: 280px;
+  max-width: 500px;
 }
-.infobox-half {
-  margin-left: 4000px;
+
+/* Regular infoboxes (with blocks/charts) - positioned in the last 2/3 of Yale wealth */
+.yale .infobox-first {
+  left: calc(5vw + 100vw);
+  top: 80px;
 }
-.infobox-quarter {
-  margin-left: 2000px;
+
+.yale .infobox-second {
+  left: calc(5vw + 200vw);
+  top: 80px;
 }
-.infobox-close {
-  margin-left: 500px;
+
+.yale .infobox-third {
+  left: calc(5vw + 300vw);
+  top: 80px;
+}
+
+.yale .infobox-fourth {
+  left: calc(5vw + 400vw);
+  top: 80px;
+}
+
+.yale .infobox-fifth {
+  left: calc(5vw + 500vw);
+  top: 80px;
+}
+
+.yale .infobox-sixth {
+  left: calc(5vw + 600vw);
+  top: 80px;
+}
+
+.yale .infobox-seventh {
+  left: calc(5vw + 700vw);
+  top: 80px;
+}
+
+.yale .infobox-eighth {
+  left: calc(5vw + 800vw);
+  top: 80px;
+}
+
+.yale .infobox-ninth {
+  left: calc(5vw + 900vw);
+  top: 80px;
+}
+
+.yale .infobox-tenth {
+  left: calc(5vw + 1000vw);
+  top: 80px;
+}
+
+.yale .infobox-eleventh {
+  left: calc(5vw + 1100vw);
+  top: 80px;
+}
+
+.yale .infobox-twelfth {
+  left: calc(5vw + 1200vw);
+  top: 80px;
+}
+
+.yale .infobox-thirteenth {
+  left: calc(5vw + 1300vw);
+  top: 80px;
+}
+
+.yale .infobox-fourteenth {
+  left: calc(5vw + 1400vw);
+  top: 80px;
+}
+
+.yale .infobox-fifteenth {
+  left: calc(5vw + 1500vw);
+  top: 80px;
+}
+
+.yale .infobox-sixteenth {
+  left: calc(5vw + 1600vw);
+  top: 80px;
+}
+
+.yale .infobox-seventeenth {
+  left: calc(5vw + 1700vw);
+  top: 80px;
+}
+
+.yale .infobox-eighteenth {
+  left: calc(5vw + 1800vw);
+  top: 80px;
+}
+
+.yale .infobox-nineteenth {
+  left: calc(5vw + 1900vw);
+  top: 80px;
+}
+
+.yale .infobox-twentieth {
+  left: calc(5vw + 2000vw);
+  top: 80px;
+}
+
+.yale .infobox-twenty-first {
+  left: calc(5vw + 2100vw);
+  top: 120px;
+}
+
+.yale .infobox-twenty-second {
+  left: calc(5vw + 2200vw);
+  top: 160px;
+}
+
+.yale .infobox-twenty-third {
+  left: calc(5vw + 2300vw);
+  top: 200px;
+}
+
+.yale .infobox-twenty-fourth {
+  left: calc(5vw + 2400vw);
+  top: 80px;
+}
+
+/* Handle infobox-close class */
+.yale .infobox-close {
+  left: calc(5vw + 2500vw);
+  top: 80px;
+}
+
+/* Text infoboxes - positioned in the first third of Yale wealth, but starting 25 viewport widths in */
+.yale .text-infobox.infobox-first {
+  left: calc(5vw + 2500vw);
+  top: 80px;
+}
+
+.yale .text-infobox.infobox-second {
+  left: calc(5vw + 2510vw);
+  top: 80px;
+}
+
+.yale .text-infobox.infobox-third {
+  left: calc(5vw + 2520vw);
+  top: 80px;
+}
+
+.yale .text-infobox.infobox-fourth {
+  left: calc(5vw + 2530vw);
+  top: 80px;
+}
+
+.yale .text-infobox.infobox-fifth {
+  left: calc(5vw + 2540vw);
+  top: 80px;
+}
+
+.yale .text-infobox.infobox-sixth {
+  left: calc(5vw + 2550vw);
+  top: 80px;
+}
+
+.yale .text-infobox.infobox-seventh {
+  left: calc(5vw + 2560vw);
+  top: 80px;
+}
+
+.yale .text-infobox.infobox-eighth {
+  left: calc(5vw + 2570vw);
+  top: 80px;
+}
+
+.yale .text-infobox.infobox-ninth {
+  left: calc(5vw + 2580vw);
+  top: 80px;
+}
+
+.yale .text-infobox.infobox-tenth {
+  left: calc(5vw + 2590vw);
+  top: 80px;
+}
+
+.yale .text-infobox.infobox-eleventh {
+  left: calc(5vw + 2600vw);
+  top: 80px;
+}
+
+.yale .text-infobox.infobox-twelfth {
+  left: calc(5vw + 2610vw);
+  top: 80px;
+}
+
+.yale .text-infobox.infobox-thirteenth {
+  left: calc(5vw + 2620vw);
+  top: 80px;
+}
+
+.yale .text-infobox.infobox-fourteenth {
+  left: calc(5vw + 2630vw);
+  top: 80px;
+}
+
+.yale .text-infobox.infobox-fifteenth {
+  left: calc(5vw + 2640vw);
+  top: 80px;
+}
+
+.yale .text-infobox.infobox-sixteenth {
+  left: calc(5vw + 2650vw);
+  top: 80px;
+}
+
+.yale .text-infobox.infobox-seventeenth {
+  left: calc(5vw + 2660vw);
+  top: 80px;
+}
+
+.yale .text-infobox.infobox-eighteenth {
+  left: calc(5vw + 2670vw);
+  top: 80px;
+}
+
+.yale .text-infobox.infobox-nineteenth {
+  left: calc(5vw + 2680vw);
+  top: 80px;
+}
+
+.yale .text-infobox.infobox-twentieth {
+  left: calc(5vw + 2690vw);
+  top: 80px;
+}
+
+.yale .text-infobox.infobox-twenty-first {
+  left: calc(5vw + 2700vw);
+  top: 120px;
+}
+
+.yale .text-infobox.infobox-twenty-second {
+  left: calc(5vw + 2710vw);
+  top: 160px;
+}
+
+.yale .text-infobox.infobox-twenty-third {
+  left: calc(5vw + 2720vw);
+  top: 200px;
+}
+
+.yale .text-infobox.infobox-twenty-fourth {
+  left: calc(5vw + 2730vw);
+  top: 80px;
+}
+
+.yale .text-infobox.infobox-close {
+  left: calc(5vw + 2740vw);
+  top: 80px;
+}
+
+@media (max-width: 450px) {
+  .infobox {
+    position: relative;
+    left: 10px !important;
+    width: calc(100vw - 20px);
+    max-width: calc(100vw - 20px);
+    margin-bottom: 20px;
+    top: auto !important;
+    display: block;
+  }
+  
+  .yale .wealth {
+    position: relative;
+    overflow-x: auto;
+  }
+  
+  .yale .infobox {
+    position: relative;
+    left: 10px !important;
+    width: calc(100vw - 20px);
+    max-width: calc(100vw - 20px);
+    margin-bottom: 20px;
+    top: auto !important;
+    display: block;
+  }
+}
+.worker-demands-header {
+  font-size: 18px;
+  font-weight: 700;
+  color: #cf2e2e;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.worker-intro {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.worker-demands {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.demand-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background-color: rgba(207, 46, 46, 0.1);
+  border-radius: 6px;
+  border-left: 3px solid #cf2e2e;
+}
+
+.demand-icon {
+  font-size: 16px;
+  min-width: 20px;
+}
+
+.demand-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  line-height: 1.3;
 }
 .sub-infobox {
   margin: 0 40px;
@@ -438,34 +1287,49 @@ h1 {
 .column-infobox .sub-infobox {
   margin-bottom: 20px;
 }
-.one-thousand {
+/* ===== WEALTH BOX DIMENSIONS (relative to Yale) ===== */
+.wealth.one-thousand {
   width: 1px;
   height: 1px;
   margin-top: 5px;
+  display: block;
+  background-color: black;
+  margin-right: 30px;
+  min-width: 80px;
+  max-height: 400px;
 }
-.median {
-  width: 320px;
-}
-.median .wealth {
-  width: 7.94px;
-  height: 7.94px;
+.wealth.median-wage {
+  width: 8.49px;
+  height: 8.49px;
+  background-color: #FF6B35;
+  display: block;
+  margin-right: 30px;
+  min-width: 120px;
+  max-height: 400px;
 }
 .explainer {
   font-size: 16px;
   font-weight: normal;
 }
-.million {
-  width: 150px;
-}
-.million .wealth {
+.wealth.million {
   width: 31.62px;
   height: 31.62px;
   background-color: #4CAF50;
+  display: block;
+  margin-right: 30px;
+  min-width: 150px;
+  max-height: 400px;
 }
-.billion .wealth {
-  width: 2000px;
-  height: 500px;
+.wealth.billion {
+  width: 2500px;
+  height: 400px;
   background-color: #03A9F4;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-right: 30px;
+  min-width: 200px;
+  max-height: 400px;
 }
 @media (max-width: 450px) {
   .billion .wealth {
@@ -473,46 +1337,57 @@ h1 {
   }
 }
 .yale .wealth {
-  width: 667500px;
-  height: 500px;
+  width: var(--yale-width);
+  height: var(--yale-height);
   background-color: #286dc0;
   border: none;
+  position: relative;
+  overflow: visible;
+  min-width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.yale {
+  position: relative;
+}
+
+@media (max-width: 450px) {
+  .yale .wealth {
+    width: 100vw;
+    height: auto;
+    min-height: 400px;
+    overflow-x: auto;
+  }
 }
 
 
-.four-hundred .wealth {
-  margin-left: 100px;
-  width: 6401200px;
-  height: 500px;
-  background-color: #03A9F4;
-}
-
-/* Ensure four-hundred section has black text */
-.four-hundred .infobox .title {
-  color: black;
-}
-
-.four-hundred .infobox p {
-  color: black;
-}
-
-.four-hundred .infobox li {
-  color: black;
-}
-
-.four-hundred .infobox strong {
-  color: #cf2e2e;
-}
-
-
+/* ===== SCALE & MEASUREMENT ELEMENTS ===== */
 .ruler {
   background-image: url('img/ruler.svg');
   background-repeat: repeat-x;
-  background-position: 0 470px;
+  background-position: 0 370px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  z-index: 10;
+}
+
+@media (max-width: 450px) {
+  .ruler {
+    position: relative;
+    background-position: 0 0;
+    height: 30px;
+    margin-top: 10px;
+  }
 }
 .key {
   position: absolute;
-  top: 450px;
+  top: 350px;
   width: 170px;
   background-image: url(img/scale.1.0.svg);
   background-repeat: no-repeat;
@@ -529,9 +1404,7 @@ h1 {
   padding: 2px 5px;
   border-radius: 3px;
 }
-.four-hundred .key > span {
-  background-color: #03A9F4;
-}
+
 .shadow {
   box-shadow: -3px 5px 10px;
 }
@@ -548,107 +1421,208 @@ h1 {
   font-weight: 600;
   font-size: 14px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 20;
 }
-.lifetime .square {
-  width: 43.93px;
-  height: 43.93px;
-  background-color: blue;
+
+.key {
+  position: absolute;
+  top: 350px;
+  width: 170px;
+  background-image: url(img/scale.1.0.svg);
+  background-repeat: no-repeat;
+  background-position: 0px 4px;
+  display: flex;
+  justify-content: center;
+  z-index: 15;
 }
-.healthcare .square {
-  width: 4.9px;
-  height: 4.9px;
-  background-color: blue;
-}
-.amazon-year .square {
-  width: 5.76px;
-  height: 5.76px;
-  background-color: blue;
-}
-.year-veteran .square {
-  height: 400px;
-  width: 1186px;
-  margin-top: 5px;
-  background-color: #8BC34A;
-}
-.year-veteran .title {
-  width: auto;
-  padding: 10px;
-  max-width: 380px;
-  left: 0;
-}
-.year-veteran .square {
-  position: static;
-}
-@media (max-width: 450px) {
- .year-veteran .title {
-   max-width: 210px;
- }
- .year-veteran .square {
-   border-bottom: 4px dashed #75a23e;
- }
-}
-.year-chemo {
-  width: auto;
-}
-.year-chemo .square {
-  height: 400px;
-  width: 22500px;
-  background-color: #03A9F4;
-  border: 5px dashed #0078af;
-  box-sizing: border-box;
-}
-.year-chemo .square .title {
-  padding: 10px;
-  position: sticky;
-  left: 1px;
+
+.key > span {
   display: inline-block;
 }
-.year-chemo .key {
-  top: 310px;
+
+.yale .key > span {
+  background-color: #286dc0;
+  color: white;
+  padding: 2px 5px;
+  border-radius: 3px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
-.year-chemo .key > span {
-  background-color: #03A9F4;
+
+@media (max-width: 450px) {
+  .counter {
+    position: relative;
+    transform: none;
+    left: auto;
+    margin: 10px;
+  }
+  
+  .key {
+    position: relative;
+    top: auto;
+    margin: 10px;
+  }
 }
-.celebrities {
-  display: flex;
-  width: auto;
+/* ===== COST OF LIVING BLOCKS (relative to Yale) ===== */
+.lifetime .block {
+  width: max(var(--lifetime-block), 20px);
+  height: max(var(--lifetime-block), 20px);
+  background-color: blue;
+  display: block;
+  margin: 10px 0;
+  border-radius: 4px;
 }
-.beyonce .square {
-  height: 350px;
-  width: 2171px;
-  background-color: #406994;
+.rent-annual .block {
+  width: max(var(--rent-block), 20px);
+  height: max(var(--rent-block), 20px);
+  background-color: #ff4444;
+  display: block;
+  margin: 10px 0;
+  border-radius: 4px;
 }
-.altman .square {
-  width: 1000px;
-  height: 1000px;
-  background-color: #64A8F0;
+.childcare-annual .block {
+  width: max(var(--childcare-block), 20px);
+  height: max(var(--childcare-block), 20px);
+  background-color: #ff8800;
+  display: block;
+  margin: 10px 0;
+  border-radius: 4px;
 }
-.tim-cook .square {
-  width: 6286px;
-  height: 350px;
-  background-color: #71889e;
+.groceries-annual .block {
+  width: max(var(--groceries-block), 20px);
+  height: max(var(--groceries-block), 20px);
+  background-color: #44aa44;
+  display: block;
+  margin: 10px 0;
+  border-radius: 4px;
 }
-.doctor .square {
-  width: 81.8px;
-  height: 81.8px;
-  background-color: #0661b9;
+.transportation-annual .block {
+  width: max(var(--transportation-block), 20px);
+  height: max(var(--transportation-block), 20px);
+  background-color: #4444ff;
+  display: block;
+  margin: 10px 0;
+  border-radius: 4px;
 }
-.lawyer .square {
-  width: 63.2px;
-  height: 63.2px;
-  background-color: #00478a;
+.retirement-annual .block {
+  width: max(var(--retirement-block), 20px);
+  height: max(var(--retirement-block), 20px);
+  background-color: #8844ff;
+  display: block;
+  margin: 10px 0;
+  border-radius: 4px;
 }
-.hedgefund .square {
-  width: 289.8px;
-  height: 289.8px;
-  background-color: #9daebf;
+.utilities-annual .block {
+  width: max(var(--utilities-block), 20px);
+  height: max(var(--utilities-block), 20px);
+  background-color: #ffaa44;
+  display: block;
+  margin: 10px 0;
+  border-radius: 4px;
 }
+
+.annual-total .block {
+  width: max(var(--annual-total-block), 30px);
+  height: max(var(--annual-total-block), 30px);
+  background-color: #ff0000;
+  border: 2px solid #cc0000;
+  display: block;
+  margin: 10px 0;
+  border-radius: 4px;
+}
+
+.yale-worker-wage .block {
+  width: max(var(--yale-worker-wage-block), 40px);
+  height: max(var(--yale-worker-wage-block), 40px);
+  background-color: #00aa00;
+  border: 2px solid #008800;
+  display: block;
+  margin: 10px 0;
+  border-radius: 4px;
+}
+
+.yale-schwarzman .block {
+  width: var(--yale-schwarzman-block);
+  height: var(--yale-schwarzman-block);
+  background-color: #cc0000;
+  border: 3px solid #990000;
+}
+
+.yale-residential .block {
+  width: var(--yale-residential-block);
+  height: var(--yale-residential-block);
+  background-color: #cc6600;
+  border: 3px solid #993300;
+}
+
+.yale-science .block {
+  width: var(--yale-science-block);
+  height: var(--yale-science-block);
+  background-color: #cc0066;
+  border: 3px solid #990033;
+}
+
+.yale-campaign .block {
+  width: var(--yale-campaign-block);
+  height: 400px;
+  background-color: #6600cc;
+  border: 5px solid #330099;
+}
+
+.yale-worker-bonus .block {
+  width: var(--yale-worker-bonus-block);
+  height: var(--yale-worker-bonus-block);
+  background-color: #ff6900;
+  border: 2px solid #cf2e2e;
+}
+
+.yale-housing .block {
+  width: var(--yale-housing-block);
+  height: var(--yale-housing-block);
+  background-color: #ff6900;
+  border: 2px solid #cf2e2e;
+}
+
+.yale-childcare .block {
+  width: var(--yale-childcare-block);
+  height: var(--yale-childcare-block);
+  background-color: #ff6900;
+  border: 2px solid #cf2e2e;
+}
+
+.yale-minimum-wage .block {
+  width: var(--yale-minimum-wage-block);
+  height: 400px;
+  background-color: #ff6900;
+  border: 3px solid #cf2e2e;
+}
+
+.yale-housing-large .block {
+  width: var(--yale-housing-large-block);
+  height: var(--yale-housing-large-block);
+  background-color: #ff6900;
+  border: 3px solid #cf2e2e;
+}
+
+/* Utility class for height-constrained blocks */
+.block-height-constrained {
+  --original-width: var(--block-width, 1%);
+  --original-height: var(--block-height, 1%);
+  --block-area: calc(var(--original-width) * var(--original-height));
+  --constrained-height: min(var(--original-height), 300px);
+  --adjusted-width: calc(var(--block-area) / var(--constrained-height));
+  
+  width: var(--adjusted-width);
+  height: var(--constrained-height);
+}
+
+
+/* ===== LINE CHART & ZOOM FUNCTIONALITY ===== */
 .line-chart svg {
   max-width: 100%;
 }
 .line-chart .chart-outer {
   width: 720px;
-  max-width: 100vw;
+  max-width: 100%;
   text-align: center;
 }
 .line-chart .chart-inner {
@@ -670,7 +1644,7 @@ h1 {
 }
 @media (max-width: 450px) {
   .line-chart .chart-inner .zero,
-  .line-chart .chart-inner .two-hundred-million,
+  .line-chart .chart-inner .tne-thousand-million,
   .line-chart .chart-inner .zuck-name {
     font-size: 28px;
   }
@@ -703,11 +1677,12 @@ h1 {
   display: inline;
 }
 .no-single-human {
-  margin-left: 18000px;
+  left: var(--no-single-human-margin);
 }
 .no-single-human .title {
   max-width: 390px;
 }
+/* ===== PEOPLE VISUALIZATIONS ===== */
 .people {
   background-image: url('img/person.svg');
   background-size: 20px;
@@ -727,10 +1702,7 @@ h1 {
   overflow-y: auto;
   overflow-x: hidden;
 }
-.four-hundred-people .people {
-  width: 800px;
-  height: 400px;
-}
+
 .sixty-percent-people .people {
   width: 800px;
   height: 1974000px;
@@ -787,10 +1759,7 @@ h1 {
     width: 200px;
     height: 400px;
   }
-  .four-hundred-people .people {
-      width: 200px;
-      height: 400px;
-  }
+
   .sixty-percent-people .people {
     width: 200px;
     height: 1974000px;
@@ -805,11 +1774,11 @@ h1 {
 }
 .ninety-wrapper {
   width: 590px;
-  max-width: 96vw;
+  max-width: 96%;
 }
 .plane-wrapper {
   width: 480px;
-  max-width: 96vw;
+  max-width: 96%;
 }
 .ninety-wrapper img,
 .plane-wrapper img {
@@ -982,36 +1951,36 @@ h1 {
 }
 
 .yale-worker-bonus {
-  width: 98px;
-  height: 98px;
+  width: 100px;
+  height: 100px;
   background-color: #ff6900;
   border: 2px solid #cf2e2e;
 }
 
 .yale-housing {
-  width: 98px;
-  height: 98px;
+  width: 100px;
+  height: 100px;
   background-color: #ff6900;
   border: 2px solid #cf2e2e;
 }
 
 .yale-childcare {
-  width: 74px;
-  height: 74px;
+  width: 87px;
+  height: 87px;
   background-color: #ff6900;
   border: 2px solid #cf2e2e;
 }
 
 .yale-minimum-wage {
-  width: 490px;
-  height: 490px;
+  width: 224px;
+  height: 224px;
   background-color: #ff6900;
   border: 3px solid #cf2e2e;
 }
 
 .yale-housing-large {
-  width: 490px;
-  height: 490px;
+  width: 100px;
+  height: 100px;
   background-color: #ff6900;
   border: 3px solid #cf2e2e;
 }
@@ -1024,96 +1993,89 @@ h1 {
   border: 1px solid #e9ecef;
 }
 
-.yale-endowment-bar {
-  margin-bottom: 30px;
-}
 
-.yale-endowment-bar .title {
+
+.comparison-header {
+  font-size: 20px;
   font-weight: 700;
   color: #cf2e2e;
   margin-bottom: 15px;
-  font-size: 18px;
+  text-align: center;
+}
+
+.comparison-intro {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333;
+  margin-bottom: 25px;
+  text-align: center;
+  font-weight: 500;
 }
 
 
-
-.bar.yale-endowment {
-  width: 500px;
-  height: 40px;
-  background-color: #286dc0;
-  border: none;
-}
-
-.worker-benefits {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
 
 .benefit {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 15px;
+  padding: 20px;
+  background-color: rgba(255, 105, 0, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 105, 0, 0.2);
 }
 
 .benefit .title {
-  width: 220px;
-  font-size: 15px;
+  width: 100%;
+  font-size: 16px;
   color: #cf2e2e;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.4;
+  text-align: center;
 }
 
 
 
 .bar.worker-bonus {
-  width: 50px;
-  height: 20px;
+  width: 100%;
+  max-width: 400px;
+  height: 25px;
   background-color: #ff6900;
-  border: 1px solid #cf2e2e;
+  border: 2px solid #cf2e2e;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .bar.worker-housing {
-  width: 50px;
-  height: 20px;
+  width: 100%;
+  max-width: 400px;
+  height: 25px;
   background-color: #ff6900;
-  border: 1px solid #cf2e2e;
+  border: 2px solid #cf2e2e;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .bar.worker-childcare {
-  width: 37px;
-  height: 20px;
+  width: 100%;
+  max-width: 300px;
+  height: 25px;
   background-color: #ff6900;
-  border: 1px solid #cf2e2e;
+  border: 2px solid #cf2e2e;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .bar.worker-wage {
-  width: 245px;
-  height: 20px;
-  background-color: #ff6900;
-  border: 1px solid #cf2e2e;
-}
-
-.federal-education {
-  width: 245px;
-  height: 245px;
+  width: 100%;
+  max-width: 500px;
+  height: 25px;
   background-color: #ff6900;
   border: 2px solid #cf2e2e;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.student-aid {
-  width: 61px;
-  height: 61px;
-  background-color: #ff6900;
-  border: 2px solid #cf2e2e;
-}
 
-.state-cuts {
-  width: 110px;
-  height: 110px;
-  background-color: #ff6900;
-  border: 2px solid #cf2e2e;
-}
 .about {
   visibility: hidden;
   transition: opacity .7s;
@@ -1122,7 +2084,7 @@ h1 {
   top: 0;
   left: 0;
   height: 100vh;
-  width: 100vw;
+  width: 100%;
   background-color: rgba(0, 0, 0, 0.65);
 }
 .about.open {
@@ -1142,7 +2104,7 @@ h1 {
   background-color: white;
 }
 .modal-text {
-  width: calc(90vw - 40px);
+  width: calc(90% - 40px);
   height: calc(95vh - 40px);
   overflow: visible;
   padding: 20px;
@@ -1150,7 +2112,7 @@ h1 {
 .about.open .modal-inner,
 .about.open .modal-inner {
   height: 95vh;
-  width: 90vw;
+  width: 90%;
 }
 .malaria .babies {
   height: 8800320px;
@@ -1198,7 +2160,7 @@ h1 {
 .ebola-bar .title {
   max-width: 100%;
 }
-.ebola-bar .square {
+.ebola-bar .block {
   height: 122px;
   width: 122px;
   background-color: #00bb42;
@@ -1210,7 +2172,7 @@ h1 {
   margin: 0;
   text-align: center;
 }
-.malaria-bar .square {
+.malaria-bar .block {
   height: 400px;
   width: 1022px;
   background-color: #66c35a;
@@ -1218,7 +2180,7 @@ h1 {
   box-sizing: border-box;
   align-items: center;
 }
-.corona-bar .square {
+.corona-bar .block {
   height: 400px;
   width: 500px;
   background-color: green;
