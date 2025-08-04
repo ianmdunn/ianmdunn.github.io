@@ -1,25 +1,24 @@
 try {
-  console.log('=== MAIN.JS LOADING ===');
 
-  var yale = document.getElementById('yale');
-var yale_counter = document.getElementById('yale-counter');
-var yaleCounterStart = document.getElementById('yale-counter-start');
+  const yale = document.getElementById('yale');
+const yaleCounter = document.getElementById('yale-counter');
+const yaleCounterStart = document.getElementById('yale-counter-start');
 
-var babies = document.getElementById('babies-wrapper');
-var baby_counter = document.getElementById('baby-counter');
+const babies = document.getElementById('babies-wrapper');
+const babyCounter = document.getElementById('baby-counter');
 
-var thousand = new Intl.NumberFormat('en-US')
-var money = new Intl.NumberFormat('en-US', {
+const thousand = new Intl.NumberFormat('en-US');
+const money = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
   minimumFractionDigits: 0,
   maximumFractionDigits: 0,
 });
-var additional_instructions_shown = false;
+let additionalInstructionsShown = false;
 
-function detect_confused_user(e, timer) {
-  if (!additional_instructions_shown) {
-    additional_instructions_shown = true;
+function detectConfusedUser(e, timer) {
+  if (!additionalInstructionsShown) {
+    additionalInstructionsShown = true;
 
     setTimeout(function(){
       if (window.scrollX < 1) {
@@ -28,46 +27,46 @@ function detect_confused_user(e, timer) {
     }, timer);
   }
 }
-function detect_slightly_confused_user(e, timer) {
-  detect_confused_user(e, 2000);
+
+function detectSlightlyConfusedUser(e, timer) {
+  detectConfusedUser(e, 2000);
 }
-function detect_very_confused_user(e, timer) {
-  detect_confused_user(e, 4500);
+
+function detectVeryConfusedUser(e, timer) {
+  detectConfusedUser(e, 4500);
 }
 
 if (window.innerWidth > 450) {
-  document.addEventListener("mousemove", detect_very_confused_user, {once: true});
-  document.addEventListener("mousewheel", detect_slightly_confused_user, {once: true});
-  document.addEventListener("DOMMouseScroll", detect_slightly_confused_user, {once: true});
+  document.addEventListener("mousemove", detectVeryConfusedUser, {once: true});
+  document.addEventListener("mousewheel", detectSlightlyConfusedUser, {once: true});
+  document.addEventListener("DOMMouseScroll", detectSlightlyConfusedUser, {once: true});
 }
 
 window.addEventListener('scroll', function(){
-  console.log('Scroll event triggered, scrollX:', window.scrollX);
-  update_wealth_counter();
-  update_infobox_flow();
+  updateWealthCounter();
+  updateInfoboxFlow();
 });
 
 // Also listen for horizontal scroll specifically
 window.addEventListener('wheel', function(e) {
   if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-    console.log('Horizontal wheel scroll detected, deltaX:', e.deltaX);
-    update_infobox_flow();
+    updateInfoboxFlow();
   }
 });
 
 
-if (babies && baby_counter) {
+if (babies && babyCounter) {
   babies.addEventListener('scroll', function(){
-    let is_mobile = window.innerWidth <= 450;
-    let bg_size = (is_mobile) ? 68 : 160;
-    baby_counter.innerHTML = thousand.format(Math.floor(babies.scrollTop / bg_size * 5));
-  })
+    const isMobile = window.innerWidth <= 450;
+    const bgSize = (isMobile) ? 68 : 160;
+    babyCounter.innerHTML = thousand.format(Math.floor(babies.scrollTop / bgSize * 5));
+  });
 }
 
-function update_wealth_counter() {
-  if (yale && yale_counter && yaleCounterStart) {
-    if (yale_viewable()) {
-      if (yale_counter_viewable()) {
+function updateWealthCounter() {
+  if (yale && yaleCounter && yaleCounterStart) {
+    if (yaleViewable()) {
+      if (yaleCounterViewable()) {
         // Calculate position within Yale wealth box
         const yaleStart = yale.offsetLeft;
         const yaleEnd = yaleStart + yale.offsetWidth;
@@ -79,24 +78,25 @@ function update_wealth_counter() {
           const progress = (currentScroll - yaleStart) / yale.offsetWidth;
           // Calculate wealth based on percentage of $40.7 billion
           const wealth = progress * 40700000000;
-          yale_counter.innerHTML = money.format(wealth);
+          yaleCounter.innerHTML = money.format(wealth);
         } else if (currentScroll < yaleStart) {
           // Before reaching Yale wealth box
-          yale_counter.innerHTML = "$0";
+          yaleCounter.innerHTML = "$0";
         } else {
           // Past Yale wealth box
-          yale_counter.innerHTML = "$40,700,000,000";
+          yaleCounter.innerHTML = "$40,700,000,000";
         }
-      }
-      else {
-        yale_counter.innerHTML = '';
+      } else {
+        yaleCounter.innerHTML = '';
       }
     }
   }
-  function yale_viewable() {
+  
+  function yaleViewable() {
     return yale && window.scrollX < yale.offsetLeft + yale.offsetWidth + 100;
   }
-  function yale_counter_viewable() {
+  
+  function yaleCounterViewable() {
     return yaleCounterStart && yaleCounterStart.offsetLeft - window.scrollX < (window.innerWidth);
   }
 }
@@ -122,7 +122,6 @@ let pageLoadTime = null;
 
 function calculateYaleGrowth() {
   if (!growthPixelArea || !growthCounter || !growthRate) {
-    console.log('Growth elements not found:', { growthPixelArea, growthCounter, growthRate });
     return;
   }
   
@@ -151,14 +150,7 @@ function calculateYaleGrowth() {
   // Update the growth rate
   growthRate.innerHTML = growthPercentage.toFixed(4) + '%';
   
-  // Debug output
-  console.log('Growth calculation:', {
-    timeOnPage: timeOnPage,
-    growthAmount: growthAmount,
-    growthPercentage: growthPercentage,
-    pixelsToAdd: pixelsToAdd,
-    growthPerSecond: growthPerSecond
-  });
+
 }
 
 // Track total pixels added
@@ -387,7 +379,6 @@ const infoboxObjects = [
 // Helper function to compute scroll progress
 function computeScrollProgress() {
   if (!yale) {
-    console.log('Yale element not found');
     return null;
   }
   
@@ -399,14 +390,7 @@ function computeScrollProgress() {
   const relativeScroll = Math.max(0, totalScroll - yaleStart);
   const progress = relativeScroll / yaleWidth;
   
-  console.log('Progress calculation:', {
-    totalScroll,
-    yaleStart,
-    relativeScroll,
-    yaleWidth,
-    progress: progress.toFixed(4),
-    progressPercent: (progress * 100).toFixed(1) + '%'
-  });
+
   
   return {
     progress,
@@ -418,31 +402,23 @@ function computeScrollProgress() {
 }
 
 // Function to update infobox flow based on scroll position
-function update_infobox_flow() {
-  console.log('=== update_infobox_flow called ===');
-  
+function updateInfoboxFlow() {
   const scrollData = computeScrollProgress();
   if (!scrollData) return;
   
   const { progress } = scrollData;
     
-    console.log('Progress:', progress);
-    
     // Process each infobox object - bidirectional system
     infoboxObjects.forEach((infobox) => {
       const element = document.querySelector(`.infobox-${infobox.id}`);
-      console.log(`Looking for infobox ${infobox.id}:`, element ? 'found' : 'not found');
       if (element) {
         // Create a range for each infobox (start to end)
         const infoboxStart = infobox.trigger;
         const infoboxEnd = infobox.trigger + 0.03; // 3% range for each infobox - tighter, cleaner
         const shouldShow = progress >= infoboxStart && progress < infoboxEnd;
         
-        // Only log when infobox state changes to reduce console noise
+        // Check if infobox state should change
         const wasVisible = element.style.display === 'block';
-        if (shouldShow !== wasVisible) {
-          console.log(`Infobox ${infobox.id}: progress=${progress.toFixed(4)}, range=${infoboxStart.toFixed(4)}-${infoboxEnd.toFixed(4)}, shouldShow=${shouldShow}`);
-        }
         
         if (shouldShow) {
           // Show and position the infobox
@@ -465,8 +441,6 @@ function update_infobox_flow() {
           element.style.setProperty('left', `${xPosition}px`, 'important');
           element.style.setProperty('top', `${yPosition}px`, 'important');
           
-          console.log(`Showing infobox ${infobox.id} at x: ${xPosition}px, y: ${yPosition}px`);
-          
           // Create and show visual block if this infobox has block data
           // Only create dynamic blocks for later infoboxes (after 20) since early ones have static HTML blocks
           if (infobox.blockValue && infobox.id > 20) {
@@ -475,7 +449,6 @@ function update_infobox_flow() {
         } else {
           // Hide infobox when outside its range
           element.style.setProperty('display', 'none', 'important');
-          console.log(`Hiding infobox ${infobox.id} - outside range`);
           
           // Hide visual block if this infobox has block data
           // Only hide dynamic blocks for later infoboxes (after 20) since early ones have static HTML blocks
@@ -501,8 +474,6 @@ function createVisualBlock(infobox) {
   const blockValue = infobox.blockValue;
   const areaInPixels = blockValue / 1000; // $1000 = 1 square pixel
   const blockSize = Math.min(Math.sqrt(areaInPixels), maxBlockSize); // Square root for area-based sizing
-  
-  console.log(`Block sizing: value=${blockValue}, area=${areaInPixels}px², yaleHeight=${yaleHeight}, maxBlockSize=${maxBlockSize}, finalSize=${blockSize}`);
   
   // Create the visual block
   const block = document.createElement('div');
@@ -538,8 +509,6 @@ function createVisualBlock(infobox) {
   
   // Add to Yale wealth bar
   yale.appendChild(block);
-  
-  console.log(`Created visual block for infobox ${infobox.id}: ${infobox.blockLabel} (${blockSize}x${blockSize}px)`);
 }
 
 // Function to hide visual blocks
@@ -547,19 +516,11 @@ function hideVisualBlock(infoboxId) {
   const existingBlock = document.getElementById(`visual-block-${infoboxId}`);
   if (existingBlock) {
     existingBlock.remove();
-    console.log(`Removed visual block for infobox ${infoboxId}`);
-  } else {
-    console.log(`No visual block found to remove for infobox ${infoboxId}`);
   }
 }
 
-// Test if DOMContentLoaded is working
-console.log('=== SCRIPT LOADED ===');
-
 // Start the growth bar when page loads
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('=== DOM LOADED EVENT TRIGGERED ===');
-  console.log('DOM loaded, initializing growth bar...');
   initGrowthBar();
   
   

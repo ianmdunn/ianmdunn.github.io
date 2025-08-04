@@ -17,36 +17,11 @@
   --million-width: calc(var(--yale-width) * 1000000 / 40700000000);
   --billion-width: calc(var(--yale-width) * 1000000000 / 40700000000);
   
-  /* Infobox positioning relative to Yale width - systematic horizontal spacing */
-  --infobox-spacing: calc(var(--yale-width) * 0.08);
-  --infobox-first-position: calc(var(--yale-width) * 0.05);
-  --infobox-second-position: calc(var(--yale-width) * 0.13);
-  --infobox-third-position: calc(var(--yale-width) * 0.21);
-  --infobox-fourth-position: calc(var(--yale-width) * 0.29);
-  --infobox-fifth-position: calc(var(--yale-width) * 0.37);
-  --infobox-sixth-position: calc(var(--yale-width) * 0.45);
-  --infobox-seventh-position: calc(var(--yale-width) * 0.53);
-  --infobox-eighth-position: calc(var(--yale-width) * 0.61);
-  --infobox-ninth-position: calc(var(--yale-width) * 0.69);
-  --infobox-tenth-position: calc(var(--yale-width) * 0.77);
-  --infobox-eleventh-position: calc(var(--yale-width) * 0.85);
-  --infobox-twelfth-position: calc(var(--yale-width) * 0.93);
-  --infobox-thirteenth-position: calc(var(--yale-width) * 0.05);
-  --infobox-fourteenth-position: calc(var(--yale-width) * 0.13);
-  --infobox-fifteenth-position: calc(var(--yale-width) * 0.21);
-  --infobox-sixteenth-position: calc(var(--yale-width) * 0.29);
-  --infobox-seventeenth-position: calc(var(--yale-width) * 0.37);
-  --infobox-eighteenth-position: calc(var(--yale-width) * 0.45);
-  --infobox-nineteenth-position: calc(var(--yale-width) * 0.53);
-  --infobox-twentieth-position: calc(var(--yale-width) * 0.05);
-  --infobox-twenty-first-position: calc(var(--yale-width) * 0.25);
-  --infobox-twenty-second-position: calc(var(--yale-width) * 0.45);
-  --infobox-twenty-third-position: calc(var(--yale-width) * 0.65);
-  --infobox-twenty-fourth-position: calc(var(--yale-width) * 0.85);
-  
-  /* Vertical spacing for infoboxes */
+  /* Infobox spacing */
   --infobox-vertical-spacing: 200px;
   --infobox-section-spacing: 300px;
+  
+
   
   /* Block dimensions relative to Yale width (percentage of Yale's width) */
   --lifetime-block: calc(var(--yale-width) * 0.000047);
@@ -106,11 +81,7 @@ html,
   width: 100%;
 }
 
-@media (max-width: 450px) {
-  body, html {
-    overflow-x: hidden;
-  }
-}
+
 /* ===== LAYOUT CONTAINERS ===== */
 .title-screen {
   width: 100vw;
@@ -552,14 +523,18 @@ h1 {
 }
 
 .wealth-title {
-  padding: 8px 0;
+  position: relative;
   color: black;
-  white-space: normal;
   margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+  z-index: 10;
+  padding: 8px 0;
+  white-space: normal;
   word-wrap: break-word;
   overflow-wrap: break-word;
   max-width: 300px;
-  line-height: 1.4;
   text-align: left;
   align-self: flex-start;
 }
@@ -578,37 +553,24 @@ h1 {
   }
   
   .wealth.one-thousand {
-    min-width: 60px;
+    min-width: 1px;
+    min-height: 1px;
   }
   
   .wealth.median-wage {
-    min-width: 100px;
+    min-width: 8px;
+    min-height: 8px;
   }
   
   .wealth.million {
-    min-width: 120px;
+    min-width: 30px;
+    min-height: 30px;
   }
   
   .wealth.billion {
-    min-width: 150px;
+    min-width: 200px;
+    min-height: 150px;
   }
-}
-
-.wealth-title {
-  position: relative;
-  color: black;
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 1.4;
-  z-index: 10;
-  padding: 8px 0;
-  white-space: normal;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  max-width: 300px;
-  text-align: left;
-  align-self: flex-start;
 }
 
 .text-infobox .title,
@@ -742,13 +704,6 @@ h1 {
     font-size: 16px;
   }
   
-  .wealth-row {
-    flex-direction: column;
-    overflow-x: visible;
-    overflow-y: visible;
-    gap: 15px;
-  }
-  
   .wealth-wrapper {
     margin: 0.5em 1em;
     margin-bottom: 10px;
@@ -837,6 +792,11 @@ h1 {
   color: white;
 }
 
+/* Default state for all infoboxes - hidden */
+.infobox {
+  display: none;
+}
+
 /* Only show infoboxes within Yale section */
 .yale .infobox {
   display: none;
@@ -855,24 +815,23 @@ h1 {
 
 /* Infobox positioning will be handled by JavaScript */
 .yale .infobox {
-  position: fixed !important;
-  display: none !important;
-  color: white !important;
-  border: none !important;
-  pointer-events: auto !important;
-  z-index: 1000 !important;
-  width: 90vw !important;
-  max-width: 1000px !important;
-  max-height: 300px !important;
-  padding: 20px !important;
-  background-color: transparent !important;
-  border-radius: 12px !important;
-  overflow: hidden !important;
-  backdrop-filter: none !important;
-  box-shadow: none !important;
-  border: none !important;
-  font-size: 16px !important;
-  line-height: 1.6 !important;
+  position: fixed;
+  display: none;
+  color: white;
+  border: none;
+  pointer-events: auto;
+  z-index: 1000;
+  width: 90vw;
+  max-width: 1000px;
+  max-height: 300px;
+  padding: 20px;
+  background-color: transparent;
+  border-radius: 12px;
+  overflow: hidden;
+  backdrop-filter: none;
+  box-shadow: none;
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 /* Sub-classes for styling */
@@ -1295,7 +1254,6 @@ h1 {
   display: block;
   background-color: black;
   margin-right: 30px;
-  min-width: 80px;
   max-height: 400px;
 }
 .wealth.median-wage {
@@ -1304,7 +1262,6 @@ h1 {
   background-color: #FF6B35;
   display: block;
   margin-right: 30px;
-  min-width: 120px;
   max-height: 400px;
 }
 .explainer {
@@ -1317,7 +1274,6 @@ h1 {
   background-color: #4CAF50;
   display: block;
   margin-right: 30px;
-  min-width: 150px;
   max-height: 400px;
 }
 .wealth.billion {
@@ -1328,7 +1284,6 @@ h1 {
   align-items: center;
   justify-content: flex-start;
   margin-right: 30px;
-  min-width: 200px;
   max-height: 400px;
 }
 @media (max-width: 450px) {
