@@ -78,15 +78,26 @@ let manualScrollPosition = 0;
 
 // Also listen for horizontal scroll specifically
 window.addEventListener('wheel', function(e) {
-  // Accumulate horizontal scroll position
-  if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-    manualScrollPosition += e.deltaX;
-    console.log('Manual scroll position:', manualScrollPosition, 'deltaX:', e.deltaX);
-  }
+  // Check if we're on mobile (vertical scrolling)
+  const isMobile = window.innerWidth <= 450;
   
-  updateWealthCounter(); // Always update counter on wheel events
-  if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+  if (isMobile) {
+    // On mobile, track vertical scroll
+    manualScrollPosition += e.deltaY;
+    console.log('Mobile scroll position:', manualScrollPosition, 'deltaY:', e.deltaY);
+    updateWealthCounter(); // Always update counter on wheel events
     updateInfoboxFlow();
+  } else {
+    // On desktop, track horizontal scroll
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+      manualScrollPosition += e.deltaX;
+      console.log('Manual scroll position:', manualScrollPosition, 'deltaX:', e.deltaX);
+    }
+    
+    updateWealthCounter(); // Always update counter on wheel events
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+      updateInfoboxFlow();
+    }
   }
 });
 
@@ -117,45 +128,90 @@ let previousScrollPosition = 0;
 function updateWealthCounter() {
   const yaleElement = getYaleElement();
   const yaleCounterElement = getYaleCounter();
+  const isMobile = window.innerWidth <= 450;
 
   if (yaleElement && yaleCounterElement) {
-    // Get the Yale element's position relative to the viewport
-    const yaleRect = yaleElement.getBoundingClientRect();
-    const yaleLeft = yaleRect.left;
-    
-    // Show counter when the Yale element is at or past the left edge of the viewport
-    const shouldShow = yaleLeft <= 0;
-    const wasVisible = yaleCounterElement.style.display === 'block';
-    
-    if (shouldShow && !wasVisible) {
-      // Show counter
-      yaleCounterElement.style.display = 'block';
-      console.log('Counter first appeared at:', {
-        yaleLeft: yaleLeft.toFixed(2),
-        screenWidth: window.innerWidth,
-        scrollLeft: document.body.scrollLeft
-      });
-    } else if (!shouldShow && wasVisible) {
-      // Hide counter when before the Yale wealth bar start
-      yaleCounterElement.style.display = 'none';
-    }
-    
-    // Always update the value when counter is visible
-    if (shouldShow) {
-      // Calculate wealth based on how much of the Yale element has passed the left edge
-      // When yaleLeft is 0, we're at the start (should be $0)
-      // When yaleLeft is -yaleWidth, we're at the end (should be $40.7B)
-      const yaleWidth = yaleElement.offsetWidth;
-      const progress = Math.max(0, Math.min(1, -yaleLeft / yaleWidth));
+    if (isMobile) {
+      // Mobile: Use vertical scroll position
+      const yaleRect = yaleElement.getBoundingClientRect();
+      const yaleTop = yaleRect.top;
+      const viewportHeight = window.innerHeight;
       
-      // Calculate wealth: $0 at Yale start, $40.7B at Yale end
-      const wealth = progress * 40700000000;
-      yaleCounterElement.innerHTML = money.format(wealth);
+      // Show counter when the Yale element is visible in the viewport
+      const shouldShow = yaleTop <= viewportHeight && yaleTop >= -yaleElement.offsetHeight;
+      const wasVisible = yaleCounterElement.style.display === 'block';
       
-      // Log when counter value changes significantly
-      if (Math.abs(wealth - (previousWealth || 0)) > 1000000) {
-        console.log('Counter updated:', money.format(wealth), 'progress:', progress.toFixed(4));
-        previousWealth = wealth;
+      if (shouldShow && !wasVisible) {
+        // Show counter
+        yaleCounterElement.style.display = 'block';
+        console.log('Mobile counter first appeared at:', {
+          yaleTop: yaleTop.toFixed(2),
+          viewportHeight: viewportHeight,
+          scrollTop: window.pageYOffset
+        });
+      } else if (!shouldShow && wasVisible) {
+        // Hide counter when Yale element is not visible
+        yaleCounterElement.style.display = 'none';
+      }
+      
+      // Always update the value when counter is visible
+      if (shouldShow) {
+        // Calculate progress based on vertical scroll through the Yale section
+        const yaleHeight = yaleElement.offsetHeight;
+        const scrollTop = window.pageYOffset;
+        const yaleOffsetTop = yaleElement.offsetTop;
+        const relativeScroll = scrollTop - yaleOffsetTop;
+        const progress = Math.max(0, Math.min(1, relativeScroll / yaleHeight));
+        
+        // Calculate wealth: $0 at Yale start, $40.7B at Yale end
+        const wealth = progress * 40700000000;
+        yaleCounterElement.innerHTML = money.format(wealth);
+        
+        // Log when counter value changes significantly
+        if (Math.abs(wealth - (previousWealth || 0)) > 1000000) {
+          console.log('Mobile counter updated:', money.format(wealth), 'progress:', progress.toFixed(4));
+          previousWealth = wealth;
+        }
+      }
+    } else {
+      // Desktop: Use horizontal scroll position (original logic)
+      const yaleRect = yaleElement.getBoundingClientRect();
+      const yaleLeft = yaleRect.left;
+      
+      // Show counter when the Yale element is at or past the left edge of the viewport
+      const shouldShow = yaleLeft <= 0;
+      const wasVisible = yaleCounterElement.style.display === 'block';
+      
+      if (shouldShow && !wasVisible) {
+        // Show counter
+        yaleCounterElement.style.display = 'block';
+        console.log('Counter first appeared at:', {
+          yaleLeft: yaleLeft.toFixed(2),
+          screenWidth: window.innerWidth,
+          scrollLeft: document.body.scrollLeft
+        });
+      } else if (!shouldShow && wasVisible) {
+        // Hide counter when before the Yale wealth bar start
+        yaleCounterElement.style.display = 'none';
+      }
+      
+      // Always update the value when counter is visible
+      if (shouldShow) {
+        // Calculate wealth based on how much of the Yale element has passed the left edge
+        // When yaleLeft is 0, we're at the start (should be $0)
+        // When yaleLeft is -yaleWidth, we're at the end (should be $40.7B)
+        const yaleWidth = yaleElement.offsetWidth;
+        const progress = Math.max(0, Math.min(1, -yaleLeft / yaleWidth));
+        
+        // Calculate wealth: $0 at Yale start, $40.7B at Yale end
+        const wealth = progress * 40700000000;
+        yaleCounterElement.innerHTML = money.format(wealth);
+        
+        // Log when counter value changes significantly
+        if (Math.abs(wealth - (previousWealth || 0)) > 1000000) {
+          console.log('Counter updated:', money.format(wealth), 'progress:', progress.toFixed(4));
+          previousWealth = wealth;
+        }
       }
     }
   }
@@ -625,21 +681,43 @@ function computeScrollProgress() {
     return null;
   }
   
-  const totalScroll = document.body.scrollLeft;
-  const yaleStart = yaleElement.offsetLeft;
-  const yaleWidth = yaleElement.offsetWidth;
+  const isMobile = window.innerWidth <= 450;
   
-  // Calculate scroll position relative to Yale section start (allow negative values for backwards scrolling)
-  const relativeScroll = totalScroll - yaleStart;
-  const progress = relativeScroll / yaleWidth;
-  
-  return {
-    progress,
-    currentScroll: relativeScroll,
-    yaleWidth,
-    isAtStart: progress <= 0.01,
-    isAtEnd: progress >= 0.99
-  };
+  if (isMobile) {
+    // Mobile: Use vertical scroll position
+    const scrollTop = window.pageYOffset;
+    const yaleStart = yaleElement.offsetTop;
+    const yaleHeight = yaleElement.offsetHeight;
+    
+    // Calculate scroll position relative to Yale section start
+    const relativeScroll = scrollTop - yaleStart;
+    const progress = relativeScroll / yaleHeight;
+    
+    return {
+      progress,
+      currentScroll: relativeScroll,
+      yaleHeight,
+      isAtStart: progress <= 0.01,
+      isAtEnd: progress >= 0.99
+    };
+  } else {
+    // Desktop: Use horizontal scroll position
+    const totalScroll = document.body.scrollLeft;
+    const yaleStart = yaleElement.offsetLeft;
+    const yaleWidth = yaleElement.offsetWidth;
+    
+    // Calculate scroll position relative to Yale section start (allow negative values for backwards scrolling)
+    const relativeScroll = totalScroll - yaleStart;
+    const progress = relativeScroll / yaleWidth;
+    
+    return {
+      progress,
+      currentScroll: relativeScroll,
+      yaleWidth,
+      isAtStart: progress <= 0.01,
+      isAtEnd: progress >= 0.99
+    };
+  }
 }
 
 // Function to update infobox flow based on scroll position
@@ -662,25 +740,42 @@ function updateInfoboxFlow() {
         const wasVisible = element.style.display === 'block';
         
         if (shouldShow && !wasVisible) {
-          // Show and position the infobox
-          element.style.setProperty('display', 'block', 'important');
-          element.style.setProperty('position', 'fixed', 'important');
-          element.style.setProperty('z-index', '1000', 'important');
-          element.style.setProperty('max-width', '70vw', 'important');
-          element.style.setProperty('width', '70vw', 'important');
-          element.style.setProperty('background-color', 'transparent', 'important');
-          element.style.setProperty('background', 'transparent', 'important');
-          element.style.setProperty('border-radius', '0', 'important');
-          element.style.setProperty('box-shadow', 'none', 'important');
-          element.style.setProperty('border', 'none', 'important');
-          element.style.setProperty('backdrop-filter', 'none', 'important');
+          const isMobile = window.innerWidth <= 450;
           
-          // Position relative to the viewport - better positioning
-          const xPosition = window.innerWidth * 0.15; // 15% from left edge for better readability
-          const yPosition = window.innerHeight * 0.2; // 20% from top, responsive to screen height
-          
-          element.style.setProperty('left', `${xPosition}px`, 'important');
-          element.style.setProperty('top', `${yPosition}px`, 'important');
+          if (isMobile) {
+            // Mobile: Position infoboxes inline with the content flow
+            element.style.setProperty('display', 'block', 'important');
+            element.style.setProperty('position', 'relative', 'important');
+            element.style.setProperty('z-index', '1000', 'important');
+            element.style.setProperty('width', '90vw', 'important');
+            element.style.setProperty('max-width', '90vw', 'important');
+            element.style.setProperty('background-color', 'rgba(255, 255, 255, 0.95)', 'important');
+            element.style.setProperty('border', 'none', 'important');
+            element.style.setProperty('backdrop-filter', 'none', 'important');
+            element.style.setProperty('left', '5vw', 'important');
+            element.style.setProperty('top', 'auto', 'important');
+            element.style.setProperty('margin-bottom', '20px', 'important');
+          } else {
+            // Desktop: Show and position the infobox
+            element.style.setProperty('display', 'block', 'important');
+            element.style.setProperty('position', 'fixed', 'important');
+            element.style.setProperty('z-index', '1000', 'important');
+            element.style.setProperty('max-width', '70vw', 'important');
+            element.style.setProperty('width', '70vw', 'important');
+            element.style.setProperty('background-color', 'transparent', 'important');
+            element.style.setProperty('background', 'transparent', 'important');
+            element.style.setProperty('border-radius', '0', 'important');
+            element.style.setProperty('box-shadow', 'none', 'important');
+            element.style.setProperty('border', 'none', 'important');
+            element.style.setProperty('backdrop-filter', 'none', 'important');
+            
+            // Position relative to the viewport - better positioning
+            const xPosition = window.innerWidth * 0.15; // 15% from left edge for better readability
+            const yPosition = window.innerHeight * 0.2; // 20% from top, responsive to screen height
+            
+            element.style.setProperty('left', `${xPosition}px`, 'important');
+            element.style.setProperty('top', `${yPosition}px`, 'important');
+          }
           
           // Create and show visual block if this infobox has block data
           if (infobox.blockValue) {
@@ -769,58 +864,117 @@ function createVisualBlock(infobox) {
   const infoboxEnd = infobox.trigger + 0.03; // 3% range
   const infoboxCenter = infoboxStart + (infoboxEnd - infoboxStart) / 2;
   
-  // Position the block at the center of the infobox span
-  const leftPosition = infoboxCenter * 100;
+  const isMobile = window.innerWidth <= 450;
   
-  block.style.cssText = `
-    position: absolute;
-    left: ${leftPosition}%;
-    top: ${20 + offsetDistance}px;
-    width: ${blockSize}px;
-    height: ${blockSize}px;
-    background-color: #ff6900;
-    z-index: 1001;
-    pointer-events: auto;
-    transition: all 0.3s ease;
-  `;
+  if (isMobile) {
+    // Mobile: Position blocks vertically within the Yale wealth bar
+    const topPosition = infoboxCenter * 100;
+    
+    block.style.cssText = `
+      position: absolute;
+      left: 50%;
+      top: ${topPosition}%;
+      transform: translateX(-50%);
+      width: ${blockSize}px;
+      height: ${blockSize}px;
+      background-color: #ff6900;
+      z-index: 1001;
+      pointer-events: auto;
+      transition: all 0.3s ease;
+    `;
+  } else {
+    // Desktop: Position blocks horizontally
+    const leftPosition = infoboxCenter * 100;
+    
+    block.style.cssText = `
+      position: absolute;
+      left: ${leftPosition}%;
+      top: ${20 + offsetDistance}px;
+      width: ${blockSize}px;
+      height: ${blockSize}px;
+      background-color: #ff6900;
+      z-index: 1001;
+      pointer-events: auto;
+      transition: all 0.3s ease;
+    `;
+  }
   
   // Add label with offset positioning
   const label = document.createElement('div');
-  const labelTop = -45; // Further up from the block
-  const labelLeft = '50%';
   
-  label.style.cssText = `
-    position: absolute;
-    top: ${labelTop}px;
-    left: ${labelLeft};
-    transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, 0.9);
-    color: white;
-    padding: 6px 10px;
-    font-size: 11px;
-    font-weight: 600;
-    white-space: nowrap;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    z-index: 1002;
-  `;
+  if (isMobile) {
+    // Mobile: Position label to the right of the block
+    const labelTop = '50%';
+    const labelLeft = '100%';
+    
+    label.style.cssText = `
+      position: absolute;
+      top: ${labelTop};
+      left: ${labelLeft};
+      transform: translateY(-50%);
+      background-color: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 6px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      z-index: 1002;
+      margin-left: 10px;
+    `;
+  } else {
+    // Desktop: Position label above the block
+    const labelTop = -45; // Further up from the block
+    const labelLeft = '50%';
+    
+    label.style.cssText = `
+      position: absolute;
+      top: ${labelTop}px;
+      left: ${labelLeft};
+      transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 6px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      z-index: 1002;
+    `;
+  }
   label.textContent = infobox.blockLabel;
   block.appendChild(label);
   
   // Add arrow for all blocks
   const arrow = document.createElement('div');
-  arrow.style.cssText = `
-    position: absolute;
-    top: -35px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-top: 16px solid rgba(0, 0, 0, 0.9);
-    z-index: 1001;
-  `;
+  
+  if (isMobile) {
+    // Mobile: Arrow pointing to the right
+    arrow.style.cssText = `
+      position: absolute;
+      top: 50%;
+      left: -10px;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-right: 16px solid rgba(0, 0, 0, 0.9);
+      z-index: 1001;
+    `;
+  } else {
+    // Desktop: Arrow pointing up
+    arrow.style.cssText = `
+      position: absolute;
+      top: -35px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 16px solid rgba(0, 0, 0, 0.9);
+      z-index: 1001;
+    `;
+  }
   block.appendChild(arrow);
   
   // Add value display on the block only if block is large enough (minimum 20px)
@@ -900,6 +1054,15 @@ document.addEventListener('DOMContentLoaded', function() {
   initGrowthBar();
   initializeVisibleBlocks(); // Initialize visible blocks on page load
   updateWealthCounter(); // Initialize counter on page load
+});
+
+// Handle resize events for mobile/desktop switching
+window.addEventListener('resize', function() {
+  // Reinitialize visible blocks when screen size changes
+  setTimeout(() => {
+    initializeVisibleBlocks();
+    updateWealthCounter();
+  }, 100);
 });
 
 } catch (error) {

@@ -1411,6 +1411,7 @@ h1 {
     position: relative;
     top: auto;
     margin: 10px;
+    width: 125px;
   }
 }
 /* ===== COST OF LIVING BLOCKS (relative to Yale) ===== */
@@ -2303,5 +2304,436 @@ h1 {
     transform: none;
     font-size: 16px;
     min-width: auto;
+  }
+}
+
+/* ===== MOBILE LAYOUT TRANSFORMATION ===== */
+@media (max-width: 450px) {
+  /* Reset base layout for mobile vertical scrolling */
+  body, html {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  
+  /* Transform the wealth wrapper to vertical layout */
+  .wealth-wrapper-outer {
+    min-width: 100vw;
+    width: 100vw;
+    overflow-x: hidden;
+    overflow-y: auto;
+    display: block;
+  }
+  
+  /* Transform wealth row to vertical stack */
+  .wealth-row {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    min-width: 100vw;
+    width: 100vw;
+    overflow-x: hidden;
+    overflow-y: auto;
+    gap: 30px;
+    padding: 30px 0;
+  }
+  
+  /* Transform wealth wrappers to vertical blocks */
+  .wealth-wrapper {
+    margin: 0;
+    padding: 0;
+    width: 90vw;
+    max-width: 90vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  
+  /* Transform wealth bars to vertical orientation */
+  .wealth {
+    width: 90vw !important;
+    max-width: 90vw !important;
+    min-width: 90vw !important;
+    height: auto !important;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    position: relative;
+  }
+  
+  /* Specific wealth bar transformations */
+  .wealth.one-thousand {
+    width: 90vw !important;
+    height: 60px !important;
+    min-height: 60px !important;
+    background-color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .wealth.median-wage {
+    width: 90vw !important;
+    height: 60px !important;
+    min-height: 60px !important;
+    background-color: #FF6B35;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .wealth.million {
+    width: 90vw !important;
+    height: 60px !important;
+    min-height: 60px !important;
+    background-color: #4CAF50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .wealth.billion {
+    width: 90vw !important;
+    height: 60px !important;
+    min-height: 60px !important;
+    background-color: #03A9F4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Yale wealth bar - use device width as constant, calculate height */
+  .yale .wealth {
+    width: 90vw !important;
+    height: calc(90vw * 0.4) !important; /* 40% of width for height */
+    min-height: 200px;
+    max-height: 400px;
+    background-color: #286dc0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+    overflow: visible;
+  }
+  
+  /* Transform title screen for mobile */
+  .title-screen {
+    width: 100vw;
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    background-color: #ffffff;
+    padding: 20px;
+  }
+  
+  /* Update scroll instructions for mobile */
+  .scroll-this-way {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    height: auto;
+    padding: 20px;
+    font-size: 18px;
+    text-align: center;
+    background-image: url(img/arrow.svg);
+    background-repeat: no-repeat;
+    background-size: 30px;
+    background-position: center 10px;
+    animation: bouncy-arrow-mobile 3s infinite;
+  }
+  
+  @keyframes bouncy-arrow-mobile {
+    0% {transform: translateY(0px);}
+    20% {transform: translateY(0px);}
+    25% {transform: translateY(-10px);}
+    30% {transform: translateY(0px);}
+    35% {transform: translateY(-10px);}
+    40% {transform: translateY(0px);}
+    100% {transform: translateY(0px);}
+  }
+  
+  /* Transform wealth titles for mobile */
+  .wealth-title {
+    position: relative;
+    color: black;
+    margin: 10px 0;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.4;
+    z-index: 10;
+    padding: 8px 12px;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 90vw;
+    text-align: center;
+    align-self: center;
+  }
+  
+  /* Yale wealth titles white on mobile */
+  .yale .wealth-title {
+    color: white;
+    background-color: rgba(40, 109, 192, 0.9);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  
+  /* Transform infoboxes for mobile vertical layout */
+  .infobox {
+    position: relative !important;
+    left: 5vw !important;
+    width: 90vw !important;
+    max-width: 90vw !important;
+    margin-bottom: 20px !important;
+    top: auto !important;
+    display: block !important;
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+  }
+  
+  .yale .infobox {
+    position: relative !important;
+    left: 5vw !important;
+    width: 90vw !important;
+    max-width: 90vw !important;
+    margin-bottom: 20px !important;
+    top: auto !important;
+    display: block !important;
+    background-color: rgba(255, 255, 255, 0.95);
+    color: #333 !important;
+    text-shadow: none !important;
+  }
+  
+  /* Transform counter for mobile */
+  #yale-counter {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(40, 109, 192, 0.95);
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    z-index: 1000;
+    min-width: 200px;
+    text-align: center;
+    pointer-events: none;
+  }
+  
+  /* Transform key/ruler for mobile */
+  .key {
+    position: relative;
+    top: auto;
+    margin: 10px auto;
+    width: 125px;
+    text-align: center;
+  }
+  
+  .ruler {
+    position: relative;
+    background-position: 0 0;
+    height: 30px;
+    margin-top: 10px;
+    width: 100%;
+  }
+  
+  /* Transform growth bar for mobile */
+  .yale-growth {
+    position: relative;
+    left: auto;
+    top: auto;
+    margin: 20px auto;
+    width: 90vw;
+  }
+  
+  .yale-growth .wealth {
+    width: 90vw !important;
+    height: 300px !important;
+    background: #f5f5f5;
+    border: 2px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .yale-growth .growth-pixel-area {
+    width: 95%;
+    height: 200px;
+    background-color: #f8f8f8;
+    border: 2px solid #ddd;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Transform visual blocks for mobile */
+  .yale-visual-block {
+    position: absolute;
+    min-width: 6px;
+    min-height: 6px;
+    top: 10px;
+    background-color: #ff6900;
+    z-index: 1001;
+    pointer-events: auto;
+    transition: ease-out 0.3s;
+    cursor: pointer;
+  }
+  
+  .yale-visual-block:hover {
+    transform: scale(1.05);
+  }
+  
+  /* Transform blocks for mobile */
+  .block {
+    width: 90vw !important;
+    height: 60px !important;
+    min-height: 60px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 0;
+  }
+  
+  /* Specific block transformations */
+  .lifetime .block {
+    background-color: blue;
+  }
+  
+  .rent-annual .block {
+    background-color: #ff4444;
+  }
+  
+  .childcare-annual .block {
+    background-color: #ff8800;
+  }
+  
+  .groceries-annual .block {
+    background-color: #44aa44;
+  }
+  
+  .transportation-annual .block {
+    background-color: #4444ff;
+  }
+  
+  .retirement-annual .block {
+    background-color: #8844ff;
+  }
+  
+  .utilities-annual .block {
+    background-color: #ffaa44;
+  }
+  
+  .annual-total .block {
+    background-color: #ff0000;
+  }
+  
+  .yale-worker-wage .block {
+    background-color: #00aa00;
+    border: 2px solid #008800;
+  }
+  
+  .yale-minimum-wage .block {
+    background-color: #ff6900;
+    border: 3px solid #cf2e2e;
+  }
+  
+  .yale-housing-large .block {
+    background-color: #ff6900;
+    border: 3px solid #cf2e2e;
+  }
+  
+  /* Transform square blocks for mobile */
+  .square {
+    width: 90vw !important;
+    height: 60px !important;
+    min-height: 60px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 0;
+  }
+  
+  /* Transform title block wrappers for mobile */
+  .title-block-wrapper {
+    width: 90vw !important;
+    max-width: 90vw !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .title-block-wrapper .title {
+    width: 90vw !important;
+    max-width: 90vw !important;
+    text-align: center;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+  
+  /* Transform title square wrappers for mobile */
+  .title-square-wrapper {
+    width: 90vw !important;
+    max-width: 90vw !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .title-square-wrapper .title {
+    width: 90vw !important;
+    max-width: 90vw !important;
+    text-align: center;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+  
+  /* Transform footer for mobile */
+  .footer {
+    padding: 20px 15px;
+    font-size: 12px;
+    margin-top: 30px;
+  }
+  
+  /* Hide horizontal scroll instructions on mobile */
+  .instructions {
+    display: none;
+  }
+  
+  /* Update scroll direction text */
+  .scroll-this-way .desktop-scroll {
+    display: none;
+  }
+  
+  .scroll-this-way .mobile-scroll {
+    display: block;
+    margin-top: 40px;
+  }
+}
+
+/* Desktop scroll text */
+@media (min-width: 451px) {
+  .scroll-this-way .desktop-scroll {
+    display: block;
+  }
+  
+  .scroll-this-way .mobile-scroll {
+    display: none;
   }
 }
