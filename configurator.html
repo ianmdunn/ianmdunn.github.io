@@ -12,96 +12,62 @@
   <style>
     /* Configurator-specific styles */
     .configurator-container {
-      display: flex;
+      display: block;
       height: 100vh;
       font-family: 'Source Sans Pro', sans-serif;
-      isolation: isolate;
-      contain: layout style paint;
+      background: #f8f9fa;
+      overflow-y: auto;
     }
 
     .sidebar {
-      width: 50%;
-      background: #f8f9fa;
-      border-right: 1px solid #dee2e6;
-      padding: 20px;
+      width: 100%;
+      background: white;
+      border-right: none;
+      padding: 0;
       overflow-y: auto;
       height: 100vh;
-      writing-mode: horizontal-tb !important;
-      text-orientation: mixed !important;
-      direction: ltr !important;
-      text-align: left !important;
+      box-shadow: none;
     }
 
-    .sidebar * {
-      writing-mode: horizontal-tb !important;
-      text-orientation: mixed !important;
-      direction: ltr !important;
-      transform: none !important;
-      white-space: normal !important;
-      word-wrap: break-word !important;
-      overflow-wrap: break-word !important;
+    .sidebar-content {
+      padding: 40px;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
-    .sidebar h2,
-    .sidebar h3,
-    .sidebar p,
-    .sidebar label,
-    .sidebar input,
-    .sidebar textarea,
-    .sidebar select,
-    .sidebar button,
-    .sidebar div {
-      display: block !important;
-      width: auto !important;
-      height: auto !important;
-      min-height: auto !important;
-      max-height: none !important;
-      transform: none !important;
-      writing-mode: horizontal-tb !important;
-      text-orientation: mixed !important;
-      direction: ltr !important;
-      text-align: left !important;
-      vertical-align: baseline !important;
-      min-width: 300px !important;
-      max-width: 100% !important;
-      box-sizing: border-box !important;
+    .sidebar-header {
+      background: linear-gradient(135deg, #ba0c2f 0%, #cf2e2e 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 0;
     }
 
-    /* Ensure form controls are properly sized */
-    .sidebar .form-control {
-      width: 100% !important;
-      min-width: 300px !important;
-      max-width: 100% !important;
-      box-sizing: border-box !important;
-    }
-
-    /* Ensure buttons are properly sized */
-    .sidebar .btn {
-      width: auto !important;
-      min-width: 80px !important;
-      max-width: 100% !important;
-      box-sizing: border-box !important;
+    .sidebar-header h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
     }
 
     .main-content {
-      width: 50%;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
+      display: none;
     }
 
     .toolbar {
-      background: #fff;
-      border-bottom: 1px solid #dee2e6;
-      padding: 15px 20px;
+      background: white;
+      border-bottom: 2px solid #e9ecef;
+      padding: 20px;
       display: flex;
       align-items: center;
       gap: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
     .preview-area {
       flex: 1;
-      background: #fff;
+      background: #f8f9fa;
+      padding: 30px;
       overflow: auto;
       position: relative;
       overflow-x: auto;
@@ -167,7 +133,20 @@
     }
 
     .config-section {
-      margin-bottom: 25px;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      border: 1px solid #e9ecef;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .config-section:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
     }
 
     .config-section h3 {
@@ -175,39 +154,68 @@
       color: #333;
       font-size: 16px;
       font-weight: 700;
-      white-space: nowrap;
-      overflow: visible;
-      text-overflow: clip;
     }
 
     .form-group {
-      margin-bottom: 15px;
+      margin-bottom: 20px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .sidebar-content {
+        padding: 20px;
+      }
+      
+      .config-section {
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+      
+      .export-section {
+        padding: 20px;
+      }
+      
+      .tab-navigation {
+        max-width: 100%;
+      }
     }
 
     .form-group label {
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
       font-weight: 600;
-      color: #555;
-      font-size: 14px;
-      white-space: nowrap;
-      overflow: visible;
-      text-overflow: clip;
+      color: #333;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .form-control {
       width: 100%;
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      padding: 12px 16px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
       font-size: 14px;
       font-family: inherit;
+      transition: all 0.3s ease;
+      background: #f8f9fa;
     }
 
     .form-control:focus {
       outline: none;
       border-color: #ba0c2f;
-      box-shadow: 0 0 0 2px rgba(186, 12, 47, 0.2);
+      box-shadow: 0 0 0 3px rgba(186, 12, 47, 0.1);
+      background: white;
     }
 
     textarea.form-control {
@@ -221,13 +229,21 @@
     }
 
     .btn {
-      padding: 8px 16px;
+      padding: 12px 20px;
       border: none;
-      border-radius: 4px;
+      border-radius: 8px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
 
     .btn-primary {
@@ -268,7 +284,50 @@
 
     .btn-group {
       display: flex;
-      gap: 8px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-group .btn {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    /* Color picker styling */
+    input[type="color"] {
+      -webkit-appearance: none;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    input[type="color"]:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    /* Improved textarea styling */
+    textarea.form-control {
+      min-height: 100px;
+      resize: vertical;
+      font-family: 'Source Sans Pro', sans-serif;
+      line-height: 1.5;
+    }
+
+    /* Help button styling */
+    #help-button {
+      background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+      border: none;
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    #help-button:hover {
+      background: linear-gradient(135deg, #138496 0%, #0f6674 100%);
+      transform: translateY(-1px);
     }
 
     .infobox-list {
@@ -309,10 +368,13 @@
       min-height: 600px;
       width: 100%;
       max-width: 1200px;
-      background: linear-gradient(90deg, #f8f9fa 0%, #e9ecef 100%);
+      background: white;
       position: relative;
-      padding: 20px;
+      padding: 30px;
       overflow: visible;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      border: 2px solid #e9ecef;
     }
 
     .overview-preview {
@@ -464,9 +526,12 @@
 
     .export-section {
       background: #f8f9fa;
-      padding: 15px;
-      border-radius: 4px;
-      margin-top: 20px;
+      padding: 30px;
+      border-radius: 12px;
+      margin-top: 30px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .export-section textarea {
@@ -477,14 +542,67 @@
     }
 
     .status-bar {
-      background: #e9ecef;
-      padding: 10px 20px;
-      border-top: 1px solid #dee2e6;
+      background: white;
+      padding: 15px 20px;
+      border-top: 2px solid #e9ecef;
       font-size: 14px;
       color: #666;
+      font-weight: 500;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 0 0 12px 12px;
     }
 
 
+
+    .tab-navigation {
+      display: flex;
+      gap: 2px;
+      margin: 20px 0;
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 4px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px 16px;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tab-btn:hover {
+      background: rgba(186, 12, 47, 0.1);
+      color: #ba0c2f;
+    }
+
+    .tab-btn.active {
+      background: #ba0c2f;
+      color: white;
+      box-shadow: 0 2px 8px rgba(186, 12, 47, 0.3);
+    }
+
+    .tab-content {
+      display: none !important;
+    }
+
+    .tab-content.active {
+      display: block !important;
+    }
 
     .drag-handle {
       position: absolute;
@@ -524,22 +642,118 @@
 <body>
   <div class="configurator-container">
     <div class="sidebar">
-      <h2 style="margin: 0 0 25px 0; color: #ba0c2f; font-size: 20px; line-height: 1.3;">Yale Endowment Configurator</h2>
+      <div class="sidebar-header">
+        <h2>Yale Endowment Configurator</h2>
+      </div>
+      <div class="sidebar-content">
       
-      <!-- Yale Wealth Bar Configuration -->
-      <div class="config-section" style="background: #e8f5e8; padding: 15px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #d4edda;">
-        <h4 style="margin: 0 0 10px 0; color: #155724;">Yale Wealth Bar Settings</h4>
-        <div class="form-group">
-          <label for="yale-endowment-value">Yale Endowment Value (billions)</label>
-          <input type="number" id="yale-endowment-value" class="form-control" value="40.7" min="1" max="1000" step="0.1">
+      <!-- Tab Navigation -->
+      <div class="tab-navigation" style="margin-bottom: 20px;">
+        <button class="tab-btn active" data-tab="wealth-bar">Wealth Bar</button>
+        <button class="tab-btn" data-tab="page-style">Page Style</button>
+        <button class="tab-btn" data-tab="infobox">Infobox</button>
+      </div>
+      
+      <!-- Wealth Bar Tab -->
+      <div id="wealth-bar-tab" class="tab-content active">
+        <div class="config-section" style="background: #e8f5e8; padding: 15px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #d4edda;">
+          <h4 style="margin: 0 0 10px 0; color: #155724;">Yale Wealth Bar Settings</h4>
+          <div class="form-group">
+            <label for="yale-endowment-value">Yale Endowment Value (billions)</label>
+            <input type="number" id="yale-endowment-value" class="form-control" value="40.7" min="1" max="1000" step="0.1">
+          </div>
+          <div class="form-group">
+            <label for="scale-factor">Scale Factor (pixels per $1,000)</label>
+            <input type="number" id="scale-factor" class="form-control" value="1" min="0.1" max="10" step="0.1">
+          </div>
+          <div style="font-size: 12px; color: #666; margin-top: 5px;">
+            Current width: <span id="current-width">40,700</span> pixels | 
+            Scale: 1 pixel = $<span id="current-scale">1,000</span>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="scale-factor">Scale Factor (pixels per $1,000)</label>
-          <input type="number" id="scale-factor" class="form-control" value="1" min="0.1" max="10" step="0.1">
+      </div>
+      
+      <!-- Page Style Tab -->
+      <div id="page-style-tab" class="tab-content">
+        <div class="config-section" style="background: #f0f8ff; padding: 15px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #cce5ff;">
+          <h4 style="margin: 0 0 10px 0; color: #004085;">Page Style Settings</h4>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="wealth-bar-color">Wealth Bar Color</label>
+              <input type="color" id="wealth-bar-color" class="form-control" value="#286dc0" style="width: 60px; height: 35px; cursor: pointer;">
+            </div>
+            
+            <div class="form-group">
+              <label for="link-color">Link Color</label>
+              <input type="color" id="link-color" class="form-control" value="#ff6900" style="width: 60px; height: 35px; cursor: pointer;">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="background-color">Page Background Color</label>
+              <input type="color" id="background-color" class="form-control" value="#ffffff" style="width: 60px; height: 35px; cursor: pointer;">
+            </div>
+            
+            <div class="form-group">
+              <label for="text-color">Main Text Color</label>
+              <input type="color" id="text-color" class="form-control" value="#333333" style="width: 60px; height: 35px; cursor: pointer;">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="title-color">Title Color</label>
+              <input type="color" id="title-color" class="form-control" value="#cf2e2e" style="width: 60px; height: 35px; cursor: pointer;">
+            </div>
+            
+            <div class="form-group">
+              <label for="infobox-bg-color">Infobox Background Color</label>
+              <input type="color" id="infobox-bg-color" class="form-control" value="transparent" style="width: 60px; height: 35px; cursor: pointer;">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="infobox-text-color">Infobox Text Color</label>
+              <input type="color" id="infobox-text-color" class="form-control" value="#ffffff" style="width: 60px; height: 35px; cursor: pointer;">
+            </div>
+            
+            <div class="form-group">
+              <label for="font-family">Font Family</label>
+              <select id="font-family" class="form-control">
+                <option value="Arial, sans-serif">Arial</option>
+                <option value="Helvetica, sans-serif">Helvetica</option>
+                <option value="Georgia, serif">Georgia</option>
+                <option value="Times New Roman, serif">Times New Roman</option>
+                <option value="Verdana, sans-serif">Verdana</option>
+                <option value="'Open Sans', sans-serif">Open Sans</option>
+                <option value="'Roboto', sans-serif">Roboto</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="font-size">Base Font Size (px)</label>
+            <input type="number" id="font-size" class="form-control" value="16" min="12" max="24" step="1">
+          </div>
         </div>
-        <div style="font-size: 12px; color: #666; margin-top: 5px;">
-          Current width: <span id="current-width">40,700</span> pixels | 
-          Scale: 1 pixel = $<span id="current-scale">1,000</span>
+      </div>
+      
+      <!-- Infobox Tab -->
+      <div id="infobox-tab" class="tab-content">
+      
+      <!-- Toolbar -->
+      <div class="config-section">
+        <h3>Quick Actions</h3>
+        <div class="btn-group" style="margin-bottom: 15px;">
+          <button class="btn btn-secondary" id="preview-mode">Preview Mode</button>
+          <button class="btn btn-secondary" id="edit-mode">Edit Mode</button>
+          <button class="btn btn-secondary" id="clear-all">Clear All</button>
+        </div>
+        <div style="font-size: 12px; color: #666;">
+          <span id="infobox-count">0</span> infoboxes created
         </div>
       </div>
       
@@ -577,37 +791,68 @@
         </div>
         
         <!-- Visual Block Configuration -->
-        <div id="visual-block-config" class="config-section" style="display: none !important; background: #f8f9fa; padding: 15px; border-radius: 4px; margin-top: 15px;">
+        <div id="visual-block-config" class="config-section" style="display: none; background: #f8f9fa; padding: 15px; border-radius: 4px; margin-top: 15px;">
           <h4 style="margin: 0 0 10px 0; color: #495057;">Visual Block Settings</h4>
+          
+          <!-- Dollar Amount Input -->
+          <div class="form-group">
+            <label for="block-dollar-value">Dollar Amount</label>
+            <input type="number" id="block-dollar-value" class="form-control" placeholder="Enter dollar amount (e.g., 1000000)" min="0" step="1000" style="border: 2px solid #007bff; font-size: 16px;">
+            <div style="font-size: 12px; color: #666; margin-top: 5px;">
+              Enter a dollar amount to automatically calculate block dimensions
+            </div>
+          </div>
+          
+          <!-- Block Color -->
           <div class="form-group">
             <label for="block-color">Block Color</label>
             <input type="color" id="block-color" class="form-control" value="#ff6900" style="width: 60px; height: 35px; cursor: pointer;">
-          </div>
-          <div class="form-group">
-            <label for="block-dollar-value">Block Dollar Value</label>
-            <input type="number" id="block-dollar-value" class="form-control" placeholder="Enter dollar amount (e.g., 1000000)" min="0" step="1000" style="border: 2px solid #007bff;">
             <div style="font-size: 12px; color: #666; margin-top: 5px;">
-              Enter a dollar amount to calculate block width based on Yale wealth bar scale
+              Background color of the visual block
             </div>
           </div>
+          
+          <!-- Block Label -->
           <div class="form-group">
-            <label for="block-height">Block Height (px)</label>
-            <input type="number" id="block-height" class="form-control" value="40" min="10" max="200">
+            <label for="block-label">Block Label</label>
+            <input type="text" id="block-label" class="form-control" placeholder="Enter block label">
             <div style="font-size: 12px; color: #666; margin-top: 5px;">
-              Height of the visual block
+              Text label that appears next to the block
             </div>
           </div>
+          
+          <!-- Show Value Toggle -->
           <div class="form-group">
-            <label for="block-padding">Top Padding (px)</label>
-            <input type="number" id="block-padding" class="form-control" value="20" min="0" max="100">
-            <div style="font-size: 12px; color: #666; margin-top: 5px;">
-              Distance between block and text above
+            <label for="show-value-toggle">Show Dollar Value on Block</label>
+            <div style="display: flex; align-items: center; margin-top: 5px;">
+              <input type="checkbox" id="show-value-toggle" class="form-control" style="width: auto; margin-right: 10px;" checked>
+              <span style="font-size: 12px; color: #666;">Display the dollar amount as text on the block</span>
+            </div>
+          </div>
+          
+          <!-- Calculated Dimensions Display -->
+          <div class="form-group" style="background: #e9ecef; padding: 10px; border-radius: 4px; margin-top: 15px;">
+            <h5 style="margin: 0 0 10px 0; color: #495057;">Calculated Dimensions</h5>
+            <div style="font-size: 14px; color: #495057;">
+              <div><strong>Width:</strong> <span id="calculated-width">0</span>px</div>
+              <div><strong>Height:</strong> <span id="calculated-height">0</span>px</div>
+              <div><strong>Scale:</strong> <span id="calculated-scale">0</span>% of Yale endowment</div>
+            </div>
+          </div>
+          
+          <!-- Live Preview -->
+          <div class="form-group" style="margin-top: 15px;">
+            <h5 style="margin: 0 0 10px 0; color: #495057;">Live Preview</h5>
+            <div id="block-preview" style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 15px; min-height: 100px; display: flex; align-items: center; justify-content: center;">
+              <div id="preview-block" style="background: #ff6900; width: 0px; height: 0px; border-radius: 0px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px; transition: all 0.3s ease;">
+                
+              </div>
             </div>
           </div>
         </div>
         
         <!-- Media Configuration -->
-        <div id="media-config" class="config-section" style="display: none !important; background: #f8f9fa; padding: 15px; border-radius: 4px; margin-top: 15px;">
+        <div id="media-config" class="config-section" style="display: none; background: #f8f9fa; padding: 15px; border-radius: 4px; margin-top: 15px;">
           <h4 style="margin: 0 0 10px 0; color: #495057;">Media Settings</h4>
           <div class="form-group">
             <label for="media-type">Media Type</label>
@@ -670,15 +915,31 @@
       <!-- Export Section -->
       <div class="export-section">
         <h3>Export Configuration</h3>
-        <div style="margin-bottom: 15px;">
+        <div class="btn-group" style="margin-bottom: 15px;">
           <button class="btn btn-success" id="export-config">Export Config</button>
           <button class="btn btn-info" id="import-config">Import Config</button>
           <input type="file" id="config-file-input" accept=".json" style="display: none;">
         </div>
-        <button class="btn btn-success" id="export-html">Export HTML</button>
-        <button class="btn btn-success" id="export-css">Export CSS</button>
-        <button class="btn btn-primary" id="apply-to-main">Apply to Main Page</button>
+        
+        <div class="btn-group" style="margin-bottom: 15px;">
+          <button class="btn btn-info" id="test-config">Test in Main Page</button>
+          <button class="btn btn-danger" id="generate-all-files">Download All Files</button>
+          <button class="btn btn-warning" id="fix-positions">Fix Positions</button>
+        </div>
+        
+        <div style="font-size: 12px; color: #666; margin-top: 5px;">
+          Downloads one file containing active-config.json, dynamic-css.css, and yale-section.html
+        </div>
+        <div style="font-size: 12px; color: #666; margin-top: 5px;">
+          Downloads one file containing active-config.json, dynamic-css.css, and yale-section.html
+        </div>
         <textarea id="export-output" placeholder="Exported code will appear here..." readonly></textarea>
+      </div>
+      
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <span id="status-message">Start by creating your first infobox using the form above</span>
+      </div>
       </div>
     </div>
     
@@ -730,7 +991,9 @@
         <p><strong>2.</strong> Both title and content support HTML formatting</p>
         <p><strong>3.</strong> Drag infoboxes in the preview area to position them</p>
         <p><strong>4.</strong> Click on any infobox in the preview to edit it</p>
-        <p><strong>5.</strong> Click "Apply to Main Page" to generate the updated visualization</p>
+        <p><strong>5.</strong> Click "Test in Main Page" to see your changes immediately</p>
+        <p><strong>6.</strong> Click "Save Configuration" to download the JSON file for permanent use</p>
+        <p><strong>7.</strong> Click "Generate All Files" to create all necessary files for updating the main page</p>
         <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;">
         <p><strong>Yale Wealth Bar:</strong> Configure the endowment value and scale factor at the top to adjust the timeline width and visual block calculations.</p>
         <p><strong>Visual Blocks:</strong> Use the dollar value field to automatically calculate block width based on the Yale wealth bar scale.</p>
@@ -755,6 +1018,9 @@
         // Initialize timeline wealth value
         const initialPercentage = document.getElementById('timeline-position').value;
         this.updateTimelineWealthValue(initialPercentage);
+        
+        // Try to load existing configuration and fix positions
+        this.loadAndFixExistingConfig();
         
         this.showStatus('Start by creating your first infobox using the form above');
         
@@ -802,34 +1068,41 @@
         const endowmentValue = parseFloat(document.getElementById('yale-endowment-value').value);
         const scaleFactor = parseFloat(document.getElementById('scale-factor').value);
         
-        // Calculate width in pixels
-        const widthInPixels = (endowmentValue * 1000000000) / (1000 / scaleFactor);
+        // Use the same scale as the main page
+        const baseWidth = 101750; // Same as CSS --yale-width
+        const baseEndowment = 40.7; // Base endowment value
+        const widthInPixels = (endowmentValue / baseEndowment) * baseWidth;
         
         // Update display
         document.getElementById('current-width').textContent = Math.round(widthInPixels).toLocaleString();
-        document.getElementById('current-scale').textContent = (1000 / scaleFactor).toLocaleString();
+        document.getElementById('current-scale').textContent = Math.round((endowmentValue * 1000000000) / widthInPixels).toLocaleString();
         
         // Update preview ruler
         const rulerPreview = document.querySelector('.yale-ruler-preview');
         if (rulerPreview) {
           rulerPreview.style.width = `${widthInPixels}px`;
           rulerPreview.querySelector('div:first-child').textContent = `Yale Endowment: $${endowmentValue} billion`;
-          rulerPreview.querySelector('div:last-child').textContent = `Scale: 1 pixel = $${(1000 / scaleFactor).toLocaleString()}`;
+          rulerPreview.querySelector('div:last-child').textContent = `Scale: 1 pixel = $${Math.round((endowmentValue * 1000000000) / widthInPixels).toLocaleString()}`;
         }
         
-        this.showStatus(`Updated Yale wealth bar: ${endowmentValue} billion at ${scaleFactor}x scale`);
+        this.showStatus(`Updated Yale wealth bar: ${endowmentValue} billion (${Math.round(widthInPixels).toLocaleString()}px)`);
       }
       
       getYaleWealthBarConfig() {
-        const endowmentValue = parseFloat(document.getElementById('yale-endowment-value').value);
-        const scaleFactor = parseFloat(document.getElementById('scale-factor').value);
-        const widthInPixels = (endowmentValue * 1000000000) / (1000 / scaleFactor);
+        const endowmentValue = parseFloat(document.getElementById('yale-endowment-value').value) || 40.7;
+        const scaleFactor = parseFloat(document.getElementById('scale-factor').value) || 1;
+        
+        // Use the same scale as the main page: 101750px for $40.7 billion
+        // This gives us the correct scale: 101750px / 40.7 billion = 2500px per billion
+        const baseWidth = 101750; // Same as CSS --yale-width
+        const baseEndowment = 40.7; // Base endowment value
+        const widthInPixels = (endowmentValue / baseEndowment) * baseWidth;
         
         return {
           endowmentValue: endowmentValue,
           scaleFactor: scaleFactor,
           widthInPixels: widthInPixels,
-          pixelsPerDollar: scaleFactor / 1000
+          pixelsPerDollar: widthInPixels / (endowmentValue * 1000000000)
         };
       }
       
@@ -867,123 +1140,275 @@
       }
       
       updateVisualBlockFromDollarValue() {
-        const dollarValue = parseFloat(document.getElementById('block-dollar-value').value);
-        if (dollarValue && dollarValue > 0) {
-          const height = parseInt(document.getElementById('block-height').value);
+        const dollarValue = parseFloat(document.getElementById('block-dollar-value').value) || 0;
+        const yaleEndowment = parseFloat(document.getElementById('yale-endowment-value').value) || 40.7;
+        const scaleFactor = parseFloat(document.getElementById('scale-factor').value) || 1;
+        
+        if (dollarValue > 0) {
+          // Get Yale wealth bar configuration
+          const yaleConfig = this.getYaleWealthBarConfig();
+          const timelineWidth = yaleConfig.widthInPixels;
           
-          // Calculate area based on dollar value
-          // Use a reasonable scale: 1 square pixel = $1,000
-          const areaScale = 1 / 1000; // 1 square pixel per $1,000
-          const totalArea = dollarValue * areaScale;
+          // Calculate the scale: how much of the Yale endowment this represents
+          const yaleEndowmentBillions = yaleEndowment * scaleFactor;
+          const scalePercentage = (dollarValue / (yaleEndowmentBillions * 1000000000)) * 100;
           
-          // Calculate width based on area and height
-          const calculatedWidth = totalArea / height;
+          // Calculate block dimensions
+          // Width: proportional to the timeline width
+          const calculatedWidth = Math.max(10, Math.min(timelineWidth * 0.8, (scalePercentage / 100) * timelineWidth));
           
-          this.showStatus(`Calculated width: ${Math.round(calculatedWidth)}px for $${dollarValue.toLocaleString()} (area: ${Math.round(totalArea)} sq px)`);
+          // Height: proportional to width for visual balance
+          const calculatedHeight = Math.max(20, Math.min(200, calculatedWidth * 0.4));
+          
+          // Ensure we have valid numbers
+          if (isNaN(calculatedWidth) || isNaN(calculatedHeight)) {
+            console.warn('Invalid block dimensions calculated:', { calculatedWidth, calculatedHeight, scalePercentage });
+            return;
+          }
+          
+          // Update the display
+          const calculatedWidthEl = document.getElementById('calculated-width');
+          const calculatedHeightEl = document.getElementById('calculated-height');
+          const calculatedScaleEl = document.getElementById('calculated-scale');
+          
+          if (calculatedWidthEl) calculatedWidthEl.textContent = Math.round(calculatedWidth);
+          if (calculatedHeightEl) calculatedHeightEl.textContent = Math.round(calculatedHeight);
+          if (calculatedScaleEl) calculatedScaleEl.textContent = scalePercentage.toFixed(4);
+          
+          // Update the preview
+          this.updateBlockPreview(dollarValue, calculatedWidth, calculatedHeight);
+          
+          this.showStatus(`Calculated: ${Math.round(calculatedWidth)}×${Math.round(calculatedHeight)}px for $${dollarValue.toLocaleString()} (${scalePercentage.toFixed(4)}% of Yale endowment)`);
+        } else {
+          // Reset display
+          const calculatedWidthEl = document.getElementById('calculated-width');
+          const calculatedHeightEl = document.getElementById('calculated-height');
+          const calculatedScaleEl = document.getElementById('calculated-scale');
+          
+          if (calculatedWidthEl) calculatedWidthEl.textContent = '0';
+          if (calculatedHeightEl) calculatedHeightEl.textContent = '0';
+          if (calculatedScaleEl) calculatedScaleEl.textContent = '0';
+          
+          this.updateBlockPreview(0, 0, 0);
+        }
+      }
+      
+      updateBlockPreview(dollarValue, width, height) {
+        const previewBlock = document.getElementById('preview-block');
+        const blockColor = document.getElementById('block-color')?.value || '#ff6900';
+        const showValue = document.getElementById('show-value-toggle')?.checked || false;
+        
+        if (previewBlock) {
+          previewBlock.style.width = `${width}px`;
+          previewBlock.style.height = `${height}px`;
+          previewBlock.style.backgroundColor = blockColor;
+          
+          // Show or hide the dollar value based on toggle
+          if (showValue && dollarValue > 0) {
+            previewBlock.textContent = `$${(dollarValue / 1000000).toFixed(1)}M`;
+          } else {
+            previewBlock.textContent = '';
+          }
+          
+          // Adjust font size based on block size
+          const fontSize = Math.max(8, Math.min(16, Math.min(width, height) * 0.3));
+          previewBlock.style.fontSize = `${fontSize}px`;
         }
       }
       
       initializeEventListeners() {
-        // Form controls
-        document.getElementById('add-infobox').addEventListener('click', () => {
-          this.addInfobox();
+        // Form controls with defensive checks
+        const addInfoboxBtn = document.getElementById('add-infobox');
+        if (addInfoboxBtn) {
+          addInfoboxBtn.addEventListener('click', () => {
+            this.addInfobox();
+          });
+        }
+        
+        const updateInfoboxBtn = document.getElementById('update-infobox');
+        if (updateInfoboxBtn) {
+          updateInfoboxBtn.addEventListener('click', () => {
+            this.updateInfobox();
+          });
+        }
+        
+        const deleteSelectedBtn = document.getElementById('delete-selected');
+        if (deleteSelectedBtn) {
+          deleteSelectedBtn.addEventListener('click', () => {
+            this.deleteSelectedInfobox();
+          });
+        }
+        
+        // Toolbar buttons with defensive checks
+        const previewModeBtn = document.getElementById('preview-mode');
+        if (previewModeBtn) {
+          previewModeBtn.addEventListener('click', () => {
+            this.setPreviewMode();
+          });
+        }
+        
+        const editModeBtn = document.getElementById('edit-mode');
+        if (editModeBtn) {
+          editModeBtn.addEventListener('click', () => {
+            this.setEditMode();
+          });
+        }
+        
+        const clearAllBtn = document.getElementById('clear-all');
+        if (clearAllBtn) {
+          clearAllBtn.addEventListener('click', () => {
+            this.clearAll();
+          });
+        }
+        
+        // Export buttons with defensive checks
+        const exportConfigBtn = document.getElementById('export-config');
+        if (exportConfigBtn) {
+          exportConfigBtn.addEventListener('click', () => {
+            this.exportConfig();
+          });
+        }
+        
+        const importConfigBtn = document.getElementById('import-config');
+        if (importConfigBtn) {
+          importConfigBtn.addEventListener('click', () => {
+            const configFileInput = document.getElementById('config-file-input');
+            if (configFileInput) {
+              configFileInput.click();
+            }
+          });
+        }
+        
+        const configFileInput = document.getElementById('config-file-input');
+        if (configFileInput) {
+          configFileInput.addEventListener('change', (e) => {
+            this.importConfig(e.target.files[0]);
+          });
+        }
+        
+        const testConfigBtn = document.getElementById('test-config');
+        if (testConfigBtn) {
+          testConfigBtn.addEventListener('click', () => {
+            this.testConfiguration();
+          });
+        }
+        
+        const generateAllFilesBtn = document.getElementById('generate-all-files');
+        if (generateAllFilesBtn) {
+          generateAllFilesBtn.addEventListener('click', () => {
+            this.generateAllFiles();
+          });
+        }
+        
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            console.log('Tab clicked:', e.target.dataset.tab);
+            this.switchTab(e.target.dataset.tab);
+          });
         });
         
-        document.getElementById('update-infobox').addEventListener('click', () => {
-          this.updateInfobox();
-        });
+        // Timeline slider with defensive check
+        const timelinePosition = document.getElementById('timeline-position');
+        if (timelinePosition) {
+          timelinePosition.addEventListener('input', (e) => {
+            const percentage = e.target.value;
+            const timelineValue = document.getElementById('timeline-value');
+            if (timelineValue) {
+              timelineValue.textContent = `${percentage}%`;
+            }
+            this.updateTimelineWealthValue(percentage);
+          });
+        }
         
-        document.getElementById('delete-selected').addEventListener('click', () => {
-          this.deleteSelectedInfobox();
-        });
+        // Type selector with defensive check
+        const infoboxType = document.getElementById('infobox-type');
+        if (infoboxType) {
+          infoboxType.addEventListener('change', (e) => {
+            this.showTypeConfig(e.target.value);
+          });
+        }
         
-        // Toolbar buttons
-        document.getElementById('preview-mode').addEventListener('click', () => {
-          this.setPreviewMode();
-        });
+        // Media file upload with defensive check
+        const mediaFile = document.getElementById('media-file');
+        if (mediaFile) {
+          mediaFile.addEventListener('change', (e) => {
+            this.handleMediaFileUpload(e.target.files[0]);
+          });
+        }
         
-        document.getElementById('edit-mode').addEventListener('click', () => {
-          this.setEditMode();
-        });
+        // Yale wealth bar configuration with defensive checks
+        const yaleEndowmentValue = document.getElementById('yale-endowment-value');
+        if (yaleEndowmentValue) {
+          yaleEndowmentValue.addEventListener('input', (e) => {
+            this.updateYaleWealthBar();
+            // Update timeline wealth value when endowment value changes
+            const currentPercentage = document.getElementById('timeline-position')?.value || 0;
+            this.updateTimelineWealthValue(currentPercentage);
+          });
+        }
         
-        document.getElementById('clear-all').addEventListener('click', () => {
-          this.clearAll();
-        });
+        const scaleFactor = document.getElementById('scale-factor');
+        if (scaleFactor) {
+          scaleFactor.addEventListener('input', (e) => {
+            this.updateYaleWealthBar();
+          });
+        }
         
-        // Export buttons
-        document.getElementById('export-config').addEventListener('click', () => {
-          this.exportConfig();
-        });
+        // Visual block dollar value with defensive check
+        const blockDollarValue = document.getElementById('block-dollar-value');
+        if (blockDollarValue) {
+          blockDollarValue.addEventListener('input', (e) => {
+            this.updateVisualBlockFromDollarValue();
+          });
+        }
         
-        document.getElementById('import-config').addEventListener('click', () => {
-          document.getElementById('config-file-input').click();
-        });
+        // Block color with defensive check
+        const blockColor = document.getElementById('block-color');
+        if (blockColor) {
+          blockColor.addEventListener('input', (e) => {
+            this.updateVisualBlockFromDollarValue();
+          });
+        }
         
-        document.getElementById('config-file-input').addEventListener('change', (e) => {
-          this.importConfig(e.target.files[0]);
-        });
+        // Show value toggle with defensive check
+        const showValueToggle = document.getElementById('show-value-toggle');
+        if (showValueToggle) {
+          showValueToggle.addEventListener('change', (e) => {
+            this.updateVisualBlockFromDollarValue();
+          });
+        }
         
-        document.getElementById('export-html').addEventListener('click', () => {
-          this.exportHTML();
-        });
+        // Help modal with defensive checks
+        const helpButton = document.getElementById('help-button');
+        if (helpButton) {
+          helpButton.addEventListener('click', () => {
+            const helpModal = document.getElementById('help-modal');
+            if (helpModal) {
+              helpModal.style.display = 'block';
+            }
+          });
+        }
         
-        document.getElementById('export-css').addEventListener('click', () => {
-          this.exportCSS();
-        });
+        const closeHelp = document.getElementById('close-help');
+        if (closeHelp) {
+          closeHelp.addEventListener('click', () => {
+            const helpModal = document.getElementById('help-modal');
+            if (helpModal) {
+              helpModal.style.display = 'none';
+            }
+          });
+        }
         
-        document.getElementById('apply-to-main').addEventListener('click', () => {
-          this.applyToMainPage();
-        });
-        
-        // Timeline slider
-        document.getElementById('timeline-position').addEventListener('input', (e) => {
-          const percentage = e.target.value;
-          document.getElementById('timeline-value').textContent = `${percentage}%`;
-          this.updateTimelineWealthValue(percentage);
-        });
-        
-        // Type selector
-        document.getElementById('infobox-type').addEventListener('change', (e) => {
-          this.showTypeConfig(e.target.value);
-        });
-        
-        // Media file upload
-        document.getElementById('media-file').addEventListener('change', (e) => {
-          this.handleMediaFileUpload(e.target.files[0]);
-        });
-        
-        // Yale wealth bar configuration
-        document.getElementById('yale-endowment-value').addEventListener('input', (e) => {
-          this.updateYaleWealthBar();
-          // Update timeline wealth value when endowment value changes
-          const currentPercentage = document.getElementById('timeline-position').value;
-          this.updateTimelineWealthValue(currentPercentage);
-        });
-        
-        document.getElementById('scale-factor').addEventListener('input', (e) => {
-          this.updateYaleWealthBar();
-        });
-        
-        // Visual block dollar value
-        document.getElementById('block-dollar-value').addEventListener('input', (e) => {
-          this.updateVisualBlockFromDollarValue();
-        });
-        
-        // Help modal
-        document.getElementById('help-button').addEventListener('click', () => {
-          document.getElementById('help-modal').style.display = 'block';
-        });
-        
-        document.getElementById('close-help').addEventListener('click', () => {
-          document.getElementById('help-modal').style.display = 'none';
-        });
-        
-        // Close modal when clicking outside
-        document.getElementById('help-modal').addEventListener('click', (e) => {
-          if (e.target.id === 'help-modal') {
-            document.getElementById('help-modal').style.display = 'none';
-          }
-        });
+        // Close modal when clicking outside with defensive check
+        const helpModal = document.getElementById('help-modal');
+        if (helpModal) {
+          helpModal.addEventListener('click', (e) => {
+            if (e.target.id === 'help-modal') {
+              helpModal.style.display = 'none';
+            }
+          });
+        }
         
         // Preview area events
         const previewContainer = document.getElementById('preview-container');
@@ -1030,7 +1455,7 @@
         const title = document.getElementById('infobox-title').value.trim();
         const content = document.getElementById('infobox-content').value.trim();
         const type = document.getElementById('infobox-type').value;
-        const timelinePosition = parseInt(document.getElementById('timeline-position').value);
+        const timelinePosition = parseInt(document.getElementById('timeline-position').value) || 10;
         
         if (!title) {
           this.showStatus('Please fill in at least a title', 'error');
@@ -1044,24 +1469,35 @@
         const x = (timelinePosition / 100) * timelineWidth + previewPadding;
         const y = 160; // 40% above bottom of wealth bar (400px height)
         
-        // Get visual block properties
-        const dollarValue = parseFloat(document.getElementById('block-dollar-value').value);
-        const height = parseInt(document.getElementById('block-height').value);
-        let calculatedWidth = 20; // Default width
+        // Get visual block properties using simplified calculation
+        const dollarValue = parseFloat(document.getElementById('block-dollar-value').value) || 0;
+        const blockColor = document.getElementById('block-color').value;
+        const blockLabel = document.getElementById('block-label').value;
         
-        if (dollarValue && dollarValue > 0) {
-          // Calculate area based on dollar value
-          const areaScale = 1 / 1000; // 1 square pixel per $1,000
-          const totalArea = dollarValue * areaScale;
-          calculatedWidth = totalArea / height;
+        // Calculate dimensions based on dollar value
+        let calculatedWidth = 0;
+        let calculatedHeight = 0;
+        
+        if (dollarValue > 0) {
+          const yaleEndowment = parseFloat(document.getElementById('yale-endowment-value').value) || 40.7;
+          const scaleFactor = parseFloat(document.getElementById('scale-factor').value) || 1;
+          const yaleEndowmentBillions = yaleEndowment * scaleFactor;
+          const scalePercentage = (dollarValue / (yaleEndowmentBillions * 1000000000)) * 100;
+          
+          // Calculate block dimensions
+          calculatedWidth = Math.max(10, Math.min(timelineWidth * 0.8, (scalePercentage / 100) * timelineWidth));
+          calculatedHeight = Math.max(20, Math.min(200, calculatedWidth * 0.4));
         }
         
         const visualBlockProps = {
-          color: document.getElementById('block-color').value,
+          color: blockColor,
           width: Math.round(calculatedWidth),
-          height: parseInt(document.getElementById('block-height').value),
-          padding: parseInt(document.getElementById('block-padding').value),
-          borderRadius: 0
+          height: Math.round(calculatedHeight),
+          padding: 20, // Default padding
+          borderRadius: 0, // Default border radius
+          showValue: document.getElementById('show-value-toggle')?.checked || false,
+          label: blockLabel,
+          value: dollarValue
         };
         
         // Get media properties
@@ -1099,7 +1535,7 @@
         const title = document.getElementById('infobox-title').value.trim();
         const content = document.getElementById('infobox-content').value.trim();
         const type = document.getElementById('infobox-type').value;
-        const timelinePosition = parseInt(document.getElementById('timeline-position').value);
+        const timelinePosition = parseInt(document.getElementById('timeline-position').value) || 10;
         
         if (!title) {
           this.showStatus('Please fill in at least a title', 'error');
@@ -1113,24 +1549,35 @@
         const x = (timelinePosition / 100) * timelineWidth + previewPadding;
         const y = 160; // 40% above bottom of wealth bar (400px height)
         
-        // Get visual block properties
-        const dollarValue = parseFloat(document.getElementById('block-dollar-value').value);
-        const height = parseInt(document.getElementById('block-height').value);
-        let calculatedWidth = 20; // Default width
+        // Get visual block properties using simplified calculation
+        const dollarValue = parseFloat(document.getElementById('block-dollar-value').value) || 0;
+        const blockColor = document.getElementById('block-color').value;
+        const blockLabel = document.getElementById('block-label').value;
         
-        if (dollarValue && dollarValue > 0) {
-          // Calculate area based on dollar value
-          const areaScale = 1 / 1000; // 1 square pixel per $1,000
-          const totalArea = dollarValue * areaScale;
-          calculatedWidth = totalArea / height;
+        // Calculate dimensions based on dollar value
+        let calculatedWidth = 0;
+        let calculatedHeight = 0;
+        
+        if (dollarValue > 0) {
+          const yaleEndowment = parseFloat(document.getElementById('yale-endowment-value').value) || 40.7;
+          const scaleFactor = parseFloat(document.getElementById('scale-factor').value) || 1;
+          const yaleEndowmentBillions = yaleEndowment * scaleFactor;
+          const scalePercentage = (dollarValue / (yaleEndowmentBillions * 1000000000)) * 100;
+          
+          // Calculate block dimensions
+          calculatedWidth = Math.max(10, Math.min(timelineWidth * 0.8, (scalePercentage / 100) * timelineWidth));
+          calculatedHeight = Math.max(20, Math.min(200, calculatedWidth * 0.4));
         }
         
         const visualBlockProps = {
-          color: document.getElementById('block-color').value,
+          color: blockColor,
           width: Math.round(calculatedWidth),
-          height: parseInt(document.getElementById('block-height').value),
-          padding: parseInt(document.getElementById('block-padding').value),
-          borderRadius: 0
+          height: Math.round(calculatedHeight),
+          padding: 20, // Default padding
+          borderRadius: 0, // Default border radius
+          showValue: document.getElementById('show-value-toggle')?.checked || false,
+          label: blockLabel,
+          value: dollarValue
         };
         
         // Get media properties
@@ -1193,7 +1640,38 @@
           visualBlock.style.width = `${props.width || 20}px`;
           visualBlock.style.height = `${props.height || 40}px`;
           visualBlock.style.backgroundColor = props.color || '#ff6900';
-          visualBlock.style.borderRadius = '0px';
+          visualBlock.style.borderRadius = `${props.borderRadius || 0}px`;
+          
+          // Add enhanced features if available
+          if (props.showValue && props.value) {
+            visualBlock.style.display = 'flex';
+            visualBlock.style.alignItems = 'center';
+            visualBlock.style.justifyContent = 'center';
+            visualBlock.style.color = 'white';
+            visualBlock.style.fontSize = '10px';
+            visualBlock.style.fontWeight = '700';
+            visualBlock.style.textShadow = '1px 1px 2px rgba(0, 0, 0, 0.8)';
+            visualBlock.textContent = `$${(props.value / 1000).toFixed(0)}k`;
+          }
+          
+          if (props.label) {
+            const label = document.createElement('div');
+            label.style.position = 'absolute';
+            label.style.top = '-25px';
+            label.style.left = '50%';
+            label.style.transform = 'translateX(-50%)';
+            label.style.fontSize = '11px';
+            label.style.fontWeight = '600';
+            label.style.color = '#333';
+            label.style.background = 'rgba(255, 255, 255, 0.9)';
+            label.style.padding = '2px 6px';
+            label.style.borderRadius = '3px';
+            label.style.whiteSpace = 'nowrap';
+            label.style.pointerEvents = 'none';
+            label.style.zIndex = '1001';
+            label.textContent = props.label;
+            visualBlock.appendChild(label);
+          }
           
           visualBlock.id = `visual-block-${infobox.id}`;
           previewContainer.appendChild(visualBlock);
@@ -1282,12 +1760,15 @@
         this.updateTimelineWealthValue(infobox.timelinePosition || 10);
         
         // Update visual block properties
-        if (infobox.visualBlockProps) {
-          document.getElementById('block-color').value = infobox.visualBlockProps.color || '#ff6900';
-          document.getElementById('block-height').value = infobox.visualBlockProps.height || 40;
-          document.getElementById('block-padding').value = infobox.visualBlockProps.padding || 20;
-          document.getElementById('block-dollar-value').value = infobox.visualBlockProps.dollarValue || '';
-        }
+                  if (infobox.visualBlockProps) {
+            document.getElementById('block-color').value = infobox.visualBlockProps.color || '#ff6900';
+            document.getElementById('block-dollar-value').value = infobox.visualBlockProps.value || '';
+            document.getElementById('block-label').value = infobox.visualBlockProps.label || '';
+            document.getElementById('show-value-toggle').checked = infobox.visualBlockProps.showValue || false;
+            
+            // Update the preview and calculated dimensions
+            this.updateVisualBlockFromDollarValue();
+          }
         
         // Update media properties
         if (infobox.mediaProps) {
@@ -1350,11 +1831,22 @@
         document.getElementById('timeline-position').value = '10';
         this.updateTimelineWealthValue(10);
         
-        // Reset visual block properties
-        document.getElementById('block-color').value = '#ff6900';
-        document.getElementById('block-height').value = '40';
-        document.getElementById('block-padding').value = '20';
-        document.getElementById('block-dollar-value').value = '';
+                  // Reset visual block properties
+          document.getElementById('block-color').value = '#ff6900';
+          document.getElementById('block-dollar-value').value = '';
+          document.getElementById('block-label').value = '';
+          document.getElementById('show-value-toggle').checked = true;
+          
+          // Reset calculated dimensions and preview
+          const calculatedWidthEl = document.getElementById('calculated-width');
+          const calculatedHeightEl = document.getElementById('calculated-height');
+          const calculatedScaleEl = document.getElementById('calculated-scale');
+          
+          if (calculatedWidthEl) calculatedWidthEl.textContent = '0';
+          if (calculatedHeightEl) calculatedHeightEl.textContent = '0';
+          if (calculatedScaleEl) calculatedScaleEl.textContent = '0';
+          
+          this.updateBlockPreview(0, 0, 0);
         
         // Reset media properties
         document.getElementById('media-type').value = 'image';
@@ -1394,6 +1886,11 @@
       
       handleDrag(e) {
         if (!this.dragTarget) return;
+        
+        // Only allow dragging infobox elements
+        if (!this.dragTarget.classList.contains('infobox-preview')) {
+          return;
+        }
         
         const rect = document.getElementById('preview-container').getBoundingClientRect();
         const x = e.clientX - rect.left;
@@ -1443,7 +1940,18 @@
           timestamp: new Date().toISOString(),
           yaleWealthBar: {
             endowmentValue: parseFloat(document.getElementById('yale-endowment-value').value),
-            scaleFactor: parseFloat(document.getElementById('scale-factor').value)
+            scaleFactor: parseFloat(document.getElementById('scale-factor').value),
+            wealthBarColor: document.getElementById('wealth-bar-color').value,
+            linkColor: document.getElementById('link-color').value
+          },
+          pageStyle: {
+            backgroundColor: document.getElementById('background-color').value,
+            textColor: document.getElementById('text-color').value,
+            titleColor: document.getElementById('title-color').value,
+            infoboxBgColor: document.getElementById('infobox-bg-color').value,
+            infoboxTextColor: document.getElementById('infobox-text-color').value,
+            fontFamily: document.getElementById('font-family').value,
+            fontSize: parseInt(document.getElementById('font-size').value)
           },
           infoboxes: this.infoboxes
         };
@@ -1480,17 +1988,43 @@
             if (config.yaleWealthBar) {
               document.getElementById('yale-endowment-value').value = config.yaleWealthBar.endowmentValue || 40.7;
               document.getElementById('scale-factor').value = config.yaleWealthBar.scaleFactor || 1;
+              document.getElementById('wealth-bar-color').value = config.yaleWealthBar.wealthBarColor || '#286dc0';
+              document.getElementById('link-color').value = config.yaleWealthBar.linkColor || '#ff6900';
               this.updateYaleWealthBar();
             }
             
-            // Import infoboxes
+            // Import page style settings
+            if (config.pageStyle) {
+              document.getElementById('background-color').value = config.pageStyle.backgroundColor || '#ffffff';
+              document.getElementById('text-color').value = config.pageStyle.textColor || '#333333';
+              document.getElementById('title-color').value = config.pageStyle.titleColor || '#cf2e2e';
+              document.getElementById('infobox-bg-color').value = config.pageStyle.infoboxBgColor || 'transparent';
+              document.getElementById('infobox-text-color').value = config.pageStyle.infoboxTextColor || '#ffffff';
+              document.getElementById('font-family').value = config.pageStyle.fontFamily || 'Arial, sans-serif';
+              document.getElementById('font-size').value = config.pageStyle.fontSize || 16;
+            }
+            
+            // Import infoboxes and recalculate positions
             this.infoboxes = config.infoboxes || [];
+            
+            // Recalculate positions for existing infoboxes using the correct scale
+            this.infoboxes.forEach(infobox => {
+              if (infobox.timelinePosition !== undefined) {
+                const yaleConfig = this.getYaleWealthBarConfig();
+                const timelineWidth = yaleConfig.widthInPixels;
+                const previewPadding = 20;
+                const x = (infobox.timelinePosition / 100) * timelineWidth + previewPadding;
+                const y = 160;
+                infobox.position = { x: x, y: y };
+              }
+            });
+            
             this.updateInfoboxList();
             this.updateInfoboxCount();
             this.renderAllInfoboxes();
             this.updateTimelineScrollbar();
             
-            this.showStatus(`Configuration imported successfully: ${this.infoboxes.length} infoboxes loaded`);
+            this.showStatus(`Configuration imported successfully: ${this.infoboxes.length} infoboxes loaded and positions recalculated`);
           } catch (error) {
             this.showStatus(`Error importing config: ${error.message}`, 'error');
           }
@@ -1525,114 +2059,621 @@
       }
       
       applyToMainPage() {
-        // Generate the HTML content for all infoboxes
-        let htmlContent = '';
-        this.infoboxes.forEach(infobox => {
-          htmlContent += `\n          <div class="infobox ${infobox.class} infobox-${infobox.type}">\n`;
-          htmlContent += `            <div class="title">${infobox.title}</div>\n`;
-          htmlContent += `            <div class="content">${infobox.content}</div>\n`;
-          htmlContent += `          </div>\n`;
+        // Get current Yale wealth bar settings
+        const endowmentValue = parseFloat(document.getElementById('yale-endowment-value').value);
+        const scaleFactor = parseFloat(document.getElementById('scale-factor').value);
+        
+        // Calculate the width based on the same scale as the main page
+        const baseWidth = 101750; // Same as CSS --yale-width
+        const baseEndowment = 40.7; // Base endowment value
+        const calculatedWidth = (endowmentValue / baseEndowment) * baseWidth;
+        
+        // Save configuration to a file that index.html can load
+        const config = {
+          version: '1.0',
+          timestamp: new Date().toISOString(),
+          yaleWealthBar: {
+            endowmentValue: endowmentValue,
+            scaleFactor: scaleFactor,
+            calculatedWidth: calculatedWidth
+          },
+          infoboxes: this.infoboxes
+        };
+        
+        // Generate CSS with dynamic values
+        const cssContent = this.generateDynamicCSS(endowmentValue, calculatedWidth);
+        
+        // Generate HTML with dynamic values
+        const htmlContent = this.generateDynamicHTML(endowmentValue);
+        
+        // Create a download link for the configuration file
+        const configJson = JSON.stringify(config, null, 2);
+        const blob = new Blob([configJson], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'current-config.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        // Also save to localStorage for immediate use
+        localStorage.setItem('yaleEndowmentConfig', configJson);
+        
+        // Show the generated CSS and HTML in the export output
+        const exportOutput = document.getElementById('export-output');
+        exportOutput.value = `// Generated CSS Variables
+${cssContent}
+
+// Generated HTML
+${htmlContent}
+
+// Configuration JSON
+${configJson}`;
+        
+        this.showStatus(`Configuration saved! Yale endowment: $${endowmentValue}B, Width: ${Math.round(calculatedWidth).toLocaleString()}px`);
+        
+        // Show instructions
+        setTimeout(() => {
+          alert(`Configuration saved successfully!
+
+Generated dynamic CSS and HTML with:
+- Yale Endowment: $${endowmentValue} billion
+- Calculated Width: ${Math.round(calculatedWidth).toLocaleString()} pixels
+
+The CSS and HTML are shown in the export area below. Copy these to update your main page!`);
+        }, 100);
+      }
+      
+      generateDynamicCSS(endowmentValue, calculatedWidth) {
+        // Calculate various block sizes based on the new endowment value
+        const endowmentInDollars = endowmentValue * 1000000000;
+        
+        // Calculate block sizes as percentages of the Yale width
+        const lifetimeBlock = (1930000 / endowmentInDollars) * 100; // $1.93M lifetime earnings
+        const rentBlock = (24000 / endowmentInDollars) * 100; // $24K annual rent
+        const childcareBlock = (15000 / endowmentInDollars) * 100; // $15K annual childcare
+        const groceriesBlock = (10000 / endowmentInDollars) * 100; // $10K annual groceries
+        const transportationBlock = (8000 / endowmentInDollars) * 100; // $8K annual transportation
+        const retirementBlock = (6000 / endowmentInDollars) * 100; // $6K annual retirement
+        const utilitiesBlock = (5000 / endowmentInDollars) * 100; // $5K annual utilities
+        const annualTotalBlock = (72000 / endowmentInDollars) * 100; // $72K total annual expenses
+        
+        // Get color settings
+        const wealthBarColor = document.getElementById('wealth-bar-color').value;
+        const linkColor = document.getElementById('link-color').value;
+        const backgroundColor = document.getElementById('background-color').value;
+        const textColor = document.getElementById('text-color').value;
+        const titleColor = document.getElementById('title-color').value;
+        const infoboxBgColor = document.getElementById('infobox-bg-color').value;
+        const infoboxTextColor = document.getElementById('infobox-text-color').value;
+        const fontFamily = document.getElementById('font-family').value;
+        const fontSize = document.getElementById('font-size').value;
+        
+        return `/* Dynamic CSS Variables for Yale Endowment: $${endowmentValue}B */
+:root {
+  --yale-width: ${Math.round(calculatedWidth)}px;
+  --yale-height: 400px;
+  --yale-area: calc(var(--yale-width) * var(--yale-height));
+  
+  /* Color settings */
+  --yale-wealth-bar-color: ${wealthBarColor};
+  --yale-link-color: ${linkColor};
+  --page-background-color: ${backgroundColor};
+  --main-text-color: ${textColor};
+  --title-color: ${titleColor};
+  --infobox-background-color: ${infoboxBgColor};
+  --infobox-text-color: ${infoboxTextColor};
+  --font-family: ${fontFamily};
+  --font-size: ${fontSize}px;
+  
+  /* Block dimensions relative to Yale width (percentage of Yale's width) */
+  --lifetime-block: calc(var(--yale-width) * ${lifetimeBlock.toFixed(6)});
+  --rent-block: calc(var(--yale-width) * ${rentBlock.toFixed(6)});
+  --childcare-block: calc(var(--yale-width) * ${childcareBlock.toFixed(6)});
+  --groceries-block: calc(var(--yale-width) * ${groceriesBlock.toFixed(6)});
+  --transportation-block: calc(var(--yale-width) * ${transportationBlock.toFixed(6)});
+  --retirement-block: calc(var(--yale-width) * ${retirementBlock.toFixed(6)});
+  --utilities-block: calc(var(--yale-width) * ${utilitiesBlock.toFixed(6)});
+  --annual-total-block: calc(var(--yale-width) * ${annualTotalBlock.toFixed(6)});
+  
+  /* Yale-specific blocks */
+  --yale-worker-wage-block: calc(var(--yale-width) * 0.00177);
+  --yale-schwarzman-block: calc(var(--yale-width) * 0.0147);
+  --yale-residential-block: calc(var(--yale-width) * 0.0037);
+  --yale-science-block: calc(var(--yale-width) * 0.0049);
+  --yale-campaign-block: calc(var(--yale-width) * 0.172);
+  --yale-worker-bonus-block: calc(var(--yale-width) * 0.0098);
+  --yale-housing-block: calc(var(--yale-width) * 0.0098);
+  --yale-childcare-block: calc(var(--yale-width) * 0.0074);
+  --yale-minimum-wage-block: calc(var(--yale-width) * 0.049);
+  --yale-housing-large-block: calc(var(--yale-width) * 0.0098);
+  
+  /* Bar dimensions relative to Yale width */
+  --worker-bonus-bar: calc(var(--yale-width) * 0.006);
+  --worker-housing-bar: calc(var(--yale-width) * 0.006);
+  --worker-childcare-bar: calc(var(--yale-width) * 0.0045);
+  --worker-wage-bar: calc(var(--yale-width) * 0.03);
+  
+  /* Growth bar dimensions */
+  --growth-bar-width: calc(var(--yale-width) * 0.15);
+  --growth-wealth-width: calc(var(--yale-width) * 0.2);
+}`;
+      }
+      
+      generateDynamicHTML(endowmentValue) {
+        return `<!-- Dynamic HTML for Yale Endowment: $${endowmentValue}B -->
+<div class="wealth-wrapper yale">
+  <div id="yale" class="wealth ruler">
+    <div class="key">
+      <span>50m</span>
+    </div>
+    <h2 class="wealth-title">$${endowmentValue} billion (Yale University endowment)</h2>
+    <div class="counter" id="yale-counter"></div>
+    
+    <!-- Infoboxes will be loaded from configuration file -->
+    <div id="infoboxes-container">
+      <!-- Infoboxes will be dynamically loaded here -->
+    </div>
+  </div>
+</div>`;
+      }
+      
+      exportDynamicCSS() {
+        const endowmentValue = parseFloat(document.getElementById('yale-endowment-value').value);
+        const baseWidth = 101750;
+        const baseEndowment = 40.7;
+        const calculatedWidth = (endowmentValue / baseEndowment) * baseWidth;
+        
+        const cssContent = this.generateDynamicCSS(endowmentValue, calculatedWidth);
+        
+        // Create download link
+        const blob = new Blob([cssContent], { type: 'text/css' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `yale-dynamic-${endowmentValue}B.css`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        // Show in export area
+        document.getElementById('export-output').value = cssContent;
+        
+        this.showStatus(`Dynamic CSS exported for $${endowmentValue}B endowment`);
+      }
+      
+      generateAllFiles() {
+        // Get current Yale wealth bar settings
+        const endowmentValue = parseFloat(document.getElementById('yale-endowment-value').value);
+        const scaleFactor = parseFloat(document.getElementById('scale-factor').value);
+        
+        // Calculate the width based on the same scale as the main page
+        const baseWidth = 101750; // Same as CSS --yale-width
+        const baseEndowment = 40.7; // Base endowment value
+        const calculatedWidth = (endowmentValue / baseEndowment) * baseWidth;
+        
+        // Generate all content
+        const cssContent = this.generateDynamicCSS(endowmentValue, calculatedWidth);
+        const htmlContent = this.generateDynamicHTML(endowmentValue);
+        
+        // Create configuration
+        const config = {
+          version: '1.0',
+          timestamp: new Date().toISOString(),
+          yaleWealthBar: {
+            endowmentValue: endowmentValue,
+            scaleFactor: scaleFactor,
+            calculatedWidth: calculatedWidth
+          },
+          infoboxes: this.infoboxes
+        };
+        
+        const configJson = JSON.stringify(config, null, 2);
+        
+        // Trigger all 3 individual file downloads
+        this.downloadAllFiles(endowmentValue, calculatedWidth, configJson, cssContent, htmlContent);
+        
+        // Also create a zip file with all the generated content
+        this.createAndDownloadZip({
+          'active-config.json': configJson,
+          'dynamic-css.css': cssContent,
+          'yale-section.html': htmlContent,
+          'README.md': this.generateReadme(endowmentValue, calculatedWidth)
         });
         
-        // Generate CSS for positioning
-        let cssContent = '';
-        this.infoboxes.forEach(infobox => {
-          cssContent += `\n.yale .infobox.${infobox.class} {\n`;
-          cssContent += `  left: ${infobox.position.x}px;\n`;
-          cssContent += `  top: ${infobox.position.y}px;\n`;
-          cssContent += `}\n`;
+        // Save to localStorage for immediate testing
+        localStorage.setItem('yaleEndowmentConfig', configJson);
+        
+        // Show summary in export area
+        const exportOutput = document.getElementById('export-output');
+        exportOutput.value = `# Generated Files for Yale Endowment: $${endowmentValue}B
+
+## Files Created:
+1. active-config.json - Configuration with infoboxes
+2. dynamic-css.css - CSS variables for new endowment value
+3. yale-section.html - HTML section for new endowment value
+4. README.md - Instructions for implementation
+
+## Implementation Steps:
+1. Replace the CSS variables in main.css with the content from dynamic-css.css
+2. Replace the Yale section in index.html with the content from yale-section.html
+3. Place active-config.json in the Config Files folder
+4. Refresh the page to see your changes
+
+## Configuration Summary:
+- Endowment Value: $${endowmentValue} billion
+- Calculated Width: ${Math.round(calculatedWidth).toLocaleString()} pixels
+- Infoboxes: ${this.infoboxes.length} created
+- Scale Factor: ${scaleFactor}x
+
+## Files Content:
+
+### active-config.json:
+${configJson}
+
+### dynamic-css.css:
+${cssContent}
+
+### yale-section.html:
+${htmlContent}`;
+        
+        this.showStatus(`Generated all files for $${endowmentValue}B endowment! Check the export area below.`);
+      }
+      
+      createIndividualFiles(files) {
+        // Create individual download links for each file
+        for (const [filename, content] of Object.entries(files)) {
+          const blob = new Blob([content], { 
+            type: filename.endsWith('.json') ? 'application/json' : 
+                  filename.endsWith('.css') ? 'text/css' : 
+                  filename.endsWith('.html') ? 'text/html' : 'text/markdown'
+          });
+          const url = URL.createObjectURL(blob);
+          
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }
+      }
+      
+      createAndDownloadZip(files) {
+        // Create a simple zip-like structure using a single file with all content
+        let zipContent = '';
+        
+        for (const [filename, content] of Object.entries(files)) {
+          zipContent += `\n\n=== ${filename} ===\n`;
+          zipContent += content;
+        }
+        
+        // Create download link
+        const blob = new Blob([zipContent], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `yale-endowment-${endowmentValue}B-files.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+      
+      generateReadme(endowmentValue, calculatedWidth) {
+        return `# Yale Endowment Files - $${endowmentValue}B
+
+Generated on: ${new Date().toLocaleString()}
+
+## Files Included:
+1. active-config.json - Configuration file with infoboxes
+2. dynamic-css.css - CSS variables for the new endowment value
+3. yale-section.html - HTML section for the new endowment value
+
+## Implementation Instructions:
+
+### 1. Update CSS Variables
+Replace the CSS variables in main.css with the content from dynamic-css.css:
+- Find the :root section in main.css
+- Replace the --yale-width and related variables
+- This will scale all visual elements to the new endowment value
+
+### 2. Update HTML Section
+Replace the Yale section in index.html with the content from yale-section.html:
+- Find the <div class="wealth-wrapper yale"> section
+- Replace it with the new HTML content
+- This updates the endowment value display
+
+### 3. Update Configuration
+Place active-config.json in the Config Files folder:
+- This contains all your infoboxes and settings
+- The page will automatically load this configuration
+
+### 4. Test Changes
+Refresh the page to see all changes applied:
+- New endowment value displayed
+- All visual elements scaled correctly
+- Your infoboxes positioned properly
+
+## Technical Details:
+- Endowment Value: $${endowmentValue} billion
+- Calculated Width: ${Math.round(calculatedWidth).toLocaleString()} pixels
+- Scale Factor: Proportional to original 40.7B baseline
+
+## Notes:
+- All block sizes are automatically recalculated
+- Infobox positions are maintained relative to the new scale
+- The system maintains proper proportions for any endowment value`;
+      }
+      
+      downloadDynamicCSS() {
+        const endowmentValue = parseFloat(document.getElementById('yale-endowment-value').value);
+        const baseWidth = 101750;
+        const baseEndowment = 40.7;
+        const calculatedWidth = (endowmentValue / baseEndowment) * baseWidth;
+        
+        const cssContent = this.generateDynamicCSS(endowmentValue, calculatedWidth);
+        
+        // Create download link
+        const blob = new Blob([cssContent], { type: 'text/css' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `dynamic-css-${endowmentValue}B.css`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        // Show in export area
+        document.getElementById('export-output').value = `# Dynamic CSS for Yale Endowment: $${endowmentValue}B
+
+## File: dynamic-css-${endowmentValue}B.css
+## Calculated Width: ${Math.round(calculatedWidth).toLocaleString()} pixels
+
+${cssContent}
+
+## Instructions:
+1. Save this file as 'dynamic-css.css' in the Config Files folder
+2. The main page will automatically load and apply these CSS variables
+3. This will scale all visual elements to the new endowment value`;
+        
+        this.showStatus(`Dynamic CSS downloaded for $${endowmentValue}B endowment`);
+      }
+      
+      downloadAllFiles(endowmentValue, calculatedWidth, configJson, cssContent, htmlContent) {
+        // Download files one by one with delays to avoid browser blocking
+        this.downloadFile('active-config.json', configJson, 'application/json', 0);
+        this.downloadFile('dynamic-css.css', cssContent, 'text/css', 500);
+        this.downloadFile('yale-section.html', htmlContent, 'text/html', 1000);
+        
+        // Show summary in export area
+        const exportOutput = document.getElementById('export-output');
+        exportOutput.value = `# All Files Downloaded for Yale Endowment: $${endowmentValue}B
+
+## Files Downloaded:
+1. active-config.json - Configuration with infoboxes
+2. dynamic-css.css - CSS variables for new endowment value  
+3. yale-section.html - HTML section for new endowment value
+
+## Implementation Steps:
+1. Place all 3 files in the Config Files folder
+2. Refresh index.html to see all changes applied
+3. The system will automatically load and apply everything
+
+## Configuration Summary:
+- Endowment Value: $${endowmentValue} billion
+- Calculated Width: ${Math.round(calculatedWidth).toLocaleString()} pixels
+- Infoboxes: ${this.infoboxes.length} created
+
+## File Contents:
+
+### active-config.json:
+${configJson}
+
+### dynamic-css.css:
+${cssContent}
+
+### yale-section.html:
+${htmlContent}`;
+        
+        this.showStatus(`Starting downloads for $${endowmentValue}B endowment...`);
+      }
+      
+      downloadFile(filename, content, mimeType, delay) {
+        setTimeout(() => {
+          const blob = new Blob([content], { type: mimeType });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+          
+          console.log(`Downloaded: ${filename}`);
+        }, delay);
+      }
+      
+      switchTab(tabName) {
+        console.log('Switching to tab:', tabName);
+        
+        // Remove active class from all tabs and buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        
+        // Add active class to selected tab and button
+        const tabButton = document.querySelector(`[data-tab="${tabName}"]`);
+        const tabContent = document.getElementById(`${tabName}-tab`);
+        
+        if (tabButton) {
+          tabButton.classList.add('active');
+          console.log('Added active class to button');
+        } else {
+          console.log('Tab button not found for:', tabName);
+        }
+        
+        if (tabContent) {
+          tabContent.classList.add('active');
+          console.log('Added active class to content');
+        } else {
+          console.log('Tab content not found for:', tabName);
+        }
+      }
+      
+      loadAndFixExistingConfig() {
+        // Try to load from localStorage first
+        const localConfig = localStorage.getItem('yaleEndowmentConfig');
+        if (localConfig) {
+          try {
+            const config = JSON.parse(localConfig);
+            if (config.infoboxes && config.infoboxes.length > 0) {
+              this.infoboxes = config.infoboxes;
+              this.fixInfoboxPositions();
+              this.showStatus(`Loaded and fixed ${this.infoboxes.length} infoboxes from localStorage`);
+              return;
+            }
+          } catch (error) {
+            console.log('Error loading from localStorage:', error);
+          }
+        }
+        
+        // If no localStorage, try to load from active-config.json
+        fetch('Config Files/active-config.json')
+          .then(response => response.json())
+          .then(config => {
+            if (config.infoboxes && config.infoboxes.length > 0) {
+              this.infoboxes = config.infoboxes;
+              this.fixInfoboxPositions();
+              this.showStatus(`Loaded and fixed ${this.infoboxes.length} infoboxes from active-config.json`);
+            }
+          })
+          .catch(error => {
+            console.log('No existing configuration found or error loading:', error);
+          });
+      }
+      
+      fixInfoboxPositions() {
+        console.log('Fixing infobox positions...');
+        
+        // Recalculate positions for all existing infoboxes
+        this.infoboxes.forEach((infobox, index) => {
+          if (infobox.timelinePosition !== undefined) {
+            const yaleConfig = this.getYaleWealthBarConfig();
+            const timelineWidth = yaleConfig.widthInPixels;
+            const previewPadding = 20;
+            const x = (infobox.timelinePosition / 100) * timelineWidth + previewPadding;
+            const y = 160;
+            
+            console.log(`Infobox ${index}: timelinePosition=${infobox.timelinePosition}%, oldX=${infobox.position.x}, newX=${x}, timelineWidth=${timelineWidth}`);
+            
+            infobox.position = { x: x, y: y };
+          }
         });
         
-        // Create a new window with the updated index.html
-        const newWindow = window.open('', '_blank');
-        newWindow.document.write(`
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-            
-            <title>Yale Endowment, shown to scale</title>
-            <meta name="description" content="Yale University's endowment is enormous. Here we visualize its scale in a unique way.">
-            
-            <meta property="og:title" content="Yale Endowment, shown to scale">
-            <meta property="og:type" content="website">
-            <meta property="og:description" content="Yale University's endowment is enormous. Here we visualize its scale in a unique way.">
-            
-            <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic,700italic|Raleway:800,300,100,600" rel="stylesheet">
-            <link rel="stylesheet" type="text/css" href="main.css">
-            <style>
-              ${cssContent}
-            </style>
-          </head>
-          <body>
-            <div class="wealth-wrapper-outer">
-              <div class="wealth-row wealth-row-one">
-                <div class="title-screen">
-                  <h1>Yale Endowment, shown to scale</h1>
-                  <div class="scroll-this-way">
-                    <span class="desktop-scroll">scroll right</span>
-                    <span class="mobile-scroll">scroll down</span>
-                    <div id="instructions" class="instructions show">To scroll right, use shift + mousewheel. If you have a touchpad, swipe sideways.</div>
-                  </div>
-                </div>
-                <div class="wealth-wrapper">
-                  <div class="wealth one-thousand"></div>
-                  <h2 class="wealth-title">$1,000</h2>
-                  <div class="arrow">
-                    <svg viewBox="668 -8 14 70" width="14" height="70">
-                      <path d="M 676.4207 61.25 L 673.2793 61.25 L 673.2793 6.822266 L 668.6 6.822266 L 674.85 -7.8 L 681.1 6.822266 L 676.4207 6.822266 Z" fill="#ccc"/>
-                    </svg>
-                  </div>
-                </div>
-                <div class="wealth-wrapper">
-                  <div class="wealth median-wage"></div>
-                  <h2 class="wealth-title">$72,000 <span class="explainer">(Average Yale worker salary)</span></h2>
-                </div>
-                <div class="wealth-wrapper">
-                  <div class="wealth million"></div>
-                  <h2 class="wealth-title">$1 million</h2>
-                </div>
-                <div class="wealth-wrapper">
-                  <div class="wealth billion">
-                    <h2 class="wealth-title">$1 billion</h2>
-                  </div>
-                </div>
-                <div class="wealth-wrapper yale">
-                  <div id="yale" class="wealth ruler">
-                    <div class="key">
-                      <span>50m</span>
-                    </div>
-                    <h2 class="wealth-title">$40.7 billion (Yale University endowment)</h2>
-                    <div class="counter" id="yale-counter"></div>
-                    ${htmlContent}
-                  </div>
-                </div>
-                <div class="wealth-wrapper yale-growth">
-                  <div id="yale-growth" class="wealth growth-wealth">
-                    <h2 class="wealth-title">Yale's Growth While You Browse</h2>
-                    <div class="growth-container">
-                      <div class="growth-pixel-area" id="growth-pixel-area">
-                        <div class="growth-counter" id="growth-counter">$0</div>
-                      </div>
-                      <div class="growth-info">
-                        <p>Growing in real-time based on your time on this page (shows up to 1 hour of growth)</p>
-                        <p class="growth-rate">Growth rate: <span id="growth-rate">0%</span></p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="footer">
-            </div>
-            <script type="text/javascript" src="main.js?version=1.10"><\/script>
-          </body>
-          </html>
-        `);
-        newWindow.document.close();
+        // Update the display
+        this.renderAllInfoboxes();
+        this.updateInfoboxList();
+        this.updateTimelineScrollbar();
         
-        this.showStatus('New page generated with your infoboxes! Check the new tab.');
+        this.showStatus(`Fixed positions for ${this.infoboxes.length} infoboxes`);
+      }
+      
+      downloadDynamicCSS() {
+        const endowmentValue = parseFloat(document.getElementById('yale-endowment-value').value);
+        const baseWidth = 101750;
+        const baseEndowment = 40.7;
+        const calculatedWidth = (endowmentValue / baseEndowment) * baseWidth;
+        
+        const cssContent = this.generateDynamicCSS(endowmentValue, calculatedWidth);
+        
+        // Create download link
+        const blob = new Blob([cssContent], { type: 'text/css' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `dynamic-css-${endowmentValue}B.css`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        // Show in export area
+        document.getElementById('export-output').value = `# Dynamic CSS for Yale Endowment: $${endowmentValue}B
+
+## File: dynamic-css-${endowmentValue}B.css
+## Calculated Width: ${Math.round(calculatedWidth).toLocaleString()} pixels
+
+${cssContent}
+
+## Instructions:
+1. Save this file as 'dynamic-css.css' in the Config Files folder
+2. The main page will automatically load and apply these CSS variables
+3. This will scale all visual elements to the new endowment value`;
+        
+        this.showStatus(`Dynamic CSS downloaded for $${endowmentValue}B endowment`);
+      }
+      
+      downloadYaleSection() {
+        const endowmentValue = parseFloat(document.getElementById('yale-endowment-value').value);
+        const htmlContent = this.generateDynamicHTML(endowmentValue);
+        
+        // Create download link
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `yale-section-${endowmentValue}B.html`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        // Show in export area
+        document.getElementById('export-output').value = `# Yale Section HTML for Yale Endowment: $${endowmentValue}B
+
+## File: yale-section-${endowmentValue}B.html
+
+${htmlContent}
+
+## Instructions:
+1. Save this file as 'yale-section.html' in the Config Files folder
+2. The main page will automatically load and apply this HTML section
+3. This will update the endowment value display in the main page`;
+        
+        this.showStatus(`Yale section HTML downloaded for $${endowmentValue}B endowment`);
+      }
+      
+      testConfiguration() {
+        // Save configuration to localStorage and open index.html in a new tab
+        const config = {
+          version: '1.0',
+          timestamp: new Date().toISOString(),
+          yaleWealthBar: {
+            endowmentValue: parseFloat(document.getElementById('yale-endowment-value').value),
+            scaleFactor: parseFloat(document.getElementById('scale-factor').value)
+          },
+          infoboxes: this.infoboxes
+        };
+        
+        const configJson = JSON.stringify(config, null, 2);
+        localStorage.setItem('yaleEndowmentConfig', configJson);
+        
+        // Open index.html in a new tab
+        const newWindow = window.open('index.html', '_blank');
+        
+        this.showStatus('Configuration saved to localStorage and opening index.html in new tab for testing');
       }
       
       updateInfoboxCount() {

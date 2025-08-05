@@ -44,7 +44,7 @@ function getYaleCounterStart() {
   return yaleCounterStart;
 }
 
-// Modern browser event handling
+// Modern browser event handling with performance optimizations
 
 function detectConfusedUser(e, timer) {
   if (!additionalInstructionsShown) {
@@ -69,23 +69,30 @@ function detectVeryConfusedUser(e, timer) {
   detectConfusedUser(e, 4500);
 }
 
-// Modern event binding
+// Modern event binding with passive listeners for better performance
 if (window.innerWidth > 450) {
-  document.addEventListener("mousemove", detectVeryConfusedUser, {once: true});
-  document.addEventListener("mousewheel", detectSlightlyConfusedUser, {once: true});
-  document.addEventListener("DOMMouseScroll", detectSlightlyConfusedUser, {once: true});
+  document.addEventListener("mousemove", detectVeryConfusedUser, {once: true, passive: true});
+  document.addEventListener("mousewheel", detectSlightlyConfusedUser, {once: true, passive: true});
+  document.addEventListener("DOMMouseScroll", detectSlightlyConfusedUser, {once: true, passive: true});
 }
 
+// Throttled scroll handler for better performance
+let scrollTimeout;
 window.addEventListener('scroll', function(){
-  updateWealthCounter();
-  updateInfoboxFlow();
-  initializeVisibleBlocks(); // Ensure all visible blocks are properly initialized
+  if (scrollTimeout) return; // Skip if already scheduled
+  
+  scrollTimeout = requestAnimationFrame(() => {
+    updateWealthCounter();
+    updateInfoboxFlow();
+    initializeVisibleBlocks();
+    scrollTimeout = null;
+  });
 });
 
 // Track manual scroll position for horizontal scrolling
 let manualScrollPosition = 0;
 
-// Also listen for horizontal scroll specifically
+// Also listen for horizontal scroll specifically with passive listener
 window.addEventListener('wheel', function(e) {
   // Check if we're on mobile (vertical scrolling)
   const isMobile = window.innerWidth <= 450;
@@ -93,14 +100,12 @@ window.addEventListener('wheel', function(e) {
   if (isMobile) {
     // On mobile, track vertical scroll
     manualScrollPosition += e.deltaY;
-    console.log('Mobile scroll position:', manualScrollPosition, 'deltaY:', e.deltaY);
     updateWealthCounter(); // Always update counter on wheel events
     updateInfoboxFlow();
   } else {
     // On desktop, track horizontal scroll
     if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
       manualScrollPosition += e.deltaX;
-      console.log('Manual scroll position:', manualScrollPosition, 'deltaX:', e.deltaX);
     }
     
     updateWealthCounter(); // Always update counter on wheel events
@@ -108,19 +113,19 @@ window.addEventListener('wheel', function(e) {
       updateInfoboxFlow();
     }
   }
-});
+}, { passive: true });
 
-// Add touch events for mobile
+// Add touch events for mobile with passive listener
 window.addEventListener('touchmove', function(e) {
   updateWealthCounter();
-});
+}, { passive: true });
 
 // Add keyboard events for arrow keys
 window.addEventListener('keydown', function(e) {
   if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
     updateWealthCounter();
   }
-});
+}, { passive: true });
 
 if (babies && babyCounter) {
   babies.addEventListener('scroll', function(){
@@ -413,342 +418,19 @@ function initGrowthBar() {
   setInterval(calculateYaleGrowth, 1000);
 }
 
-// Infobox objects with content and positioning data
-const infoboxObjects = [
-  {
-    id: 1,
-    content: "Yale's endowment is so large, that it is quite literally unimaginable.",
-    type: "text",
-    trigger: 0.05,
-    position: { left: 0.05, top: 80 }
-  },
-  {
-    id: 2,
-    content: "We rarely see wealth inequality represented to scale. This may be one of the reasons people consistently struggle to estimate the extent of wealth inequality.",
-    type: "text",
-    trigger: 0.10,
-    position: { left: 0.10, top: 80 }
-  },
-  {
-    id: 3,
-    content: "Every inch you scroll represents about $50 million.",
-    type: "text",
-    trigger: 0.15,
-    position: { left: 0.15, top: 80 }
-  },
-  {
-    id: 4,
-    content: "OK, we're coming up on the end now.",
-    type: "text",
-    trigger: 0.20,
-    position: { left: 0.20, top: 80 }
-  },
-  {
-    id: 5,
-    content: "Lol, just kidding, we're about a third of the way. Keep scrolling though, there's more to see.",
-    type: "text",
-    trigger: 0.25,
-    position: { left: 0.25, top: 80 }
-  },
-  {
-    id: 6,
-    content: "Let's put this wealth in perspective by comparing it to some familiar things.",
-    type: "text",
-    trigger: 0.30,
-    position: { left: 0.30, top: 80 }
-  },
-  {
-    id: 7,
-    content: "All the money the average American with a BA will ever earn in their entire life, from the day they are born until the day they die (about $1.93 million)",
-    type: "block",
-    trigger: 0.35,
-    position: { left: 0.35, top: 80 },
-    blockValue: 1930000,
-    blockLabel: "$1.93M lifetime earnings"
-  },
-  {
-    id: 8,
-    content: "Annual rent for a 2-bedroom apartment in New Haven ($19,116)",
-    type: "block",
-    trigger: 0.40,
-    position: { left: 0.40, top: 80 },
-    blockValue: 19116,
-    blockLabel: "$19,116 annual rent"
-  },
-  {
-    id: 9,
-    content: "Annual childcare for one child in New Haven ($14,400)",
-    type: "block",
-    trigger: 0.45,
-    position: { left: 0.45, top: 80 },
-    blockValue: 14400,
-    blockLabel: "$14,400 annual childcare"
-  },
-  {
-    id: 10,
-    content: "Annual groceries for a family of four ($9,600)",
-    type: "block",
-    trigger: 0.50,
-    position: { left: 0.50, top: 80 },
-    blockValue: 9600,
-    blockLabel: "$9,600 annual groceries"
-  },
-  {
-    id: 11,
-    content: "Annual transportation (car payment, gas, insurance) ($7,200)",
-    type: "block",
-    trigger: 0.55,
-    position: { left: 0.55, top: 80 },
-    blockValue: 7200,
-    blockLabel: "$7,200 annual transportation"
-  },
-  {
-    id: 12,
-    content: "Annual retirement savings needed ($6,000)",
-    type: "block",
-    trigger: 0.60,
-    position: { left: 0.60, top: 80 },
-    blockValue: 6000,
-    blockLabel: "$6,000 annual retirement"
-  },
-  {
-    id: 13,
-    content: "Annual utilities (electric, gas, water, internet) ($6,883)",
-    type: "block",
-    trigger: 0.65,
-    position: { left: 0.65, top: 80 },
-    blockValue: 6883,
-    blockLabel: "$6,883 annual utilities"
-  },
-  {
-    id: 14,
-    content: "<strong>We Can't Keep Up:</strong> These are just the basic annual expenses that families face. When you add them all up, it's clear why so many workers struggle to make ends meet, even with full-time jobs.",
-    type: "text",
-    trigger: 0.70,
-    position: { left: 0.70, top: 80 }
-  },
-  {
-    id: 15,
-    content: "Total annual expenses for a family of four ($62,199)",
-    type: "block",
-    trigger: 0.75,
-    position: { left: 0.75, top: 80 },
-    blockValue: 62199,
-    blockLabel: "$62,199 total annual expenses"
-  },
-  {
-    id: 16,
-    content: "Typical Yale worker annual take-home pay ($72,150)",
-    type: "block",
-    trigger: 0.80,
-    position: { left: 0.80, top: 80 },
-    blockValue: 72150,
-    blockLabel: "$72,150 annual take-home pay"
-  },
-  {
-    id: 17,
-    content: "<strong>The Reality:</strong> Annual expenses ($62,199) vs. take-home pay ($72,150) = $9,951 surplus. But this doesn't account for taxes, healthcare costs, or emergency savings. Many workers still struggle to make ends meet.",
-    type: "text",
-    trigger: 0.85,
-    position: { left: 0.85, top: 80 }
-  },
-  {
-    id: 18,
-    content: "What Yale Could Do With Just 1% of Its Endowment",
-    type: "text",
-    trigger: 0.90,
-    position: { left: 0.90, top: 80 }
-  },
-  {
-    id: 19,
-    content: "Yale's endowment is $40.7 billion. Just 1% of that is $407 million. Here's what Yale could do with that money instead of hoarding it:",
-    type: "text",
-    trigger: 0.95,
-    position: { left: 0.95, top: 80 }
-  },
-  {
-    id: 20,
-    content: "Pay every Yale worker $100,000 per year minimum ($2 billion)",
-    type: "block",
-    trigger: 1.00,
-    position: { left: 1.00, top: 80 },
-    blockValue: 2000000000,
-    blockLabel: "$2B minimum wage"
-  },
-  {
-    id: 21,
-    content: "Build 1,000 affordable housing units ($400 million)",
-    type: "block",
-    trigger: 1.05,
-    position: { left: 1.05, top: 80 },
-    blockValue: 400000000,
-    blockLabel: "$400M housing"
-  },
-  {
-    id: 22,
-    content: "What Yale Could Do for New Haven",
-    type: "text",
-    trigger: 1.10,
-    position: { left: 1.10, top: 80 }
-  },
-  {
-    id: 23,
-    content: "The Reality: What Yale Actually Does",
-    type: "text",
-    trigger: 1.15,
-    position: { left: 1.15, top: 80 }
-  },
-  {
-    id: 24,
-    content: "<strong>Yale's endowment grew by $1.4 billion in 2023 alone.</strong> That's enough money to give every Yale worker a $175,000 bonus. Instead, workers are told there's \"no money\" for raises, benefits, or better working conditions.",
-    type: "text",
-    trigger: 1.20,
-    position: { left: 1.20, top: 80 }
-  },
-  {
-    id: 25,
-    content: "<strong>New Haven's Reality:</strong> While Yale's endowment grew by $1.4 billion in 2023, New Haven faces a $15 million budget deficit. The city struggles to fund schools, maintain infrastructure, and provide services, while Yale pays less than 0.02% of its endowment in taxes to the city.",
-    type: "text",
-    trigger: 1.25,
-    position: { left: 1.25, top: 80 }
-  },
-  {
-    id: 26,
-    content: "<strong>New Haven's Cost of Living:</strong> According to PayScale, New Haven's cost of living is 8% higher than the national average. Housing costs are 2% higher, utilities are 42% higher, and transportation is 7% higher than the national average.",
-    type: "text",
-    trigger: 1.30,
-    position: { left: 1.30, top: 80 }
-  },
-  {
-    id: 27,
-    content: "Yale's 2023 endowment growth ($1.4 billion)",
-    type: "block",
-    trigger: 1.35,
-    position: { left: 1.35, top: 80 },
-    blockValue: 1400000000,
-    blockLabel: "$1.4B growth"
-  },
-  {
-    id: 28,
-    content: "New Haven's budget deficit ($15 million)",
-    type: "block",
-    trigger: 1.40,
-    position: { left: 1.40, top: 80 },
-    blockValue: 15000000,
-    blockLabel: "$15M deficit"
-  },
-  {
-    id: 29,
-    content: "Yale's annual tax contribution to New Haven ($8 million)",
-    type: "block",
-    trigger: 1.45,
-    position: { left: 1.45, top: 80 },
-    blockValue: 8000000,
-    blockLabel: "$8M taxes"
-  },
-  {
-    id: 30,
-    content: "What Yale workers actually get: average annual raise ($2,000)",
-    type: "block",
-    trigger: 1.50,
-    position: { left: 1.50, top: 80 },
-    blockValue: 2000,
-    blockLabel: "$2K raise"
-  },
-  {
-    id: 31,
-    content: "What Yale could give each worker as bonus ($175,000)",
-    type: "block",
-    trigger: 1.55,
-    position: { left: 1.55, top: 80 },
-    blockValue: 175000,
-    blockLabel: "$175K bonus"
-  },
-  {
-    id: 32,
-    content: "Yale's annual spending on administration ($500 million)",
-    type: "block",
-    trigger: 1.60,
-    position: { left: 1.60, top: 80 },
-    blockValue: 500000000,
-    blockLabel: "$500M admin"
-  },
-  {
-    id: 33,
-    content: "Yale's annual spending on student financial aid ($200 million)",
-    type: "block",
-    trigger: 1.65,
-    position: { left: 1.65, top: 80 },
-    blockValue: 200000000,
-    blockLabel: "$200M aid"
-  },
-  {
-    id: 34,
-    content: "Yale's annual spending on faculty salaries ($300 million)",
-    type: "block",
-    trigger: 1.70,
-    position: { left: 1.70, top: 80 },
-    blockValue: 300000000,
-    blockLabel: "$300M faculty"
-  },
-  {
-    id: 35,
-    content: "Yale's annual spending on facilities maintenance ($150 million)",
-    type: "block",
-    trigger: 1.75,
-    position: { left: 1.75, top: 80 },
-    blockValue: 150000000,
-    blockLabel: "$150M facilities"
-  },
-  {
-    id: 36,
-    content: "Yale's annual spending on research ($1 billion)",
-    type: "block",
-    trigger: 1.80,
-    position: { left: 1.80, top: 80 },
-    blockValue: 1000000000,
-    blockLabel: "$1B research"
-  },
-  {
-    id: 37,
-    content: "Yale's annual spending on student services ($100 million)",
-    type: "block",
-    trigger: 1.85,
-    position: { left: 1.85, top: 80 },
-    blockValue: 100000000,
-    blockLabel: "$100M services"
-  },
-  {
-    id: 38,
-    content: "Yale's annual spending on library and technology ($80 million)",
-    type: "block",
-    trigger: 1.90,
-    position: { left: 1.90, top: 80 },
-    blockValue: 80000000,
-    blockLabel: "$80M library/tech"
-  },
-  {
-    id: 39,
-    content: "Yale's annual spending on athletics ($50 million)",
-    type: "block",
-    trigger: 1.95,
-    position: { left: 1.95, top: 80 },
-    blockValue: 50000000,
-    blockLabel: "$50M athletics"
-  },
-  {
-    id: 40,
-    content: "Yale's annual spending on dining and housing ($120 million)",
-    type: "block",
-    trigger: 2.00,
-    position: { left: 2.00, top: 80 },
-    blockValue: 120000000,
-    blockLabel: "$120M dining/housing"
-  }
-];
-
 // Helper function to compute scroll progress
+// Cache for scroll progress to reduce calculations
+let scrollProgressCache = null;
+let lastScrollTime = 0;
+
 function computeScrollProgress() {
+  const now = performance.now();
+  
+  // Return cached result if called within 16ms (60fps)
+  if (scrollProgressCache && (now - lastScrollTime) < 16) {
+    return scrollProgressCache;
+  }
+  
   const yaleElement = getYaleElement();
   if (!yaleElement) {
     return null;
@@ -764,9 +446,9 @@ function computeScrollProgress() {
     
     // Calculate scroll position relative to Yale section start
     const relativeScroll = scrollTop - yaleStart;
-    const progress = relativeScroll / yaleHeight;
+    const progress = Math.max(0, Math.min(1, relativeScroll / yaleHeight));
     
-    return {
+    scrollProgressCache = {
       progress,
       currentScroll: relativeScroll,
       yaleHeight,
@@ -781,9 +463,9 @@ function computeScrollProgress() {
     
     // Calculate scroll position relative to Yale section start (allow negative values for backwards scrolling)
     const relativeScroll = totalScroll - yaleStart;
-    const progress = relativeScroll / yaleWidth;
+    const progress = Math.max(0, Math.min(1, relativeScroll / yaleWidth));
     
-    return {
+    scrollProgressCache = {
       progress,
       currentScroll: relativeScroll,
       yaleWidth,
@@ -791,81 +473,176 @@ function computeScrollProgress() {
       isAtEnd: progress >= 0.99
     };
   }
+  
+  lastScrollTime = now;
+  return scrollProgressCache;
 }
 
-// Function to update infobox flow based on scroll position
+// Function to update infobox flow based on scroll position with smooth animations
 function updateInfoboxFlow() {
   const scrollData = computeScrollProgress();
   if (!scrollData) return;
   
   const { progress } = scrollData;
+  
+  // Track scroll direction for backward scrolling support
+  if (!window.lastScrollProgress) {
+    window.lastScrollProgress = progress;
+  }
+  const scrollDirection = progress > window.lastScrollProgress ? 'forward' : 'backward';
+  window.lastScrollProgress = progress;
+  
+  // Debug: Log progress and infobox count
+  if (progress % 0.1 < 0.01) { // Log every 10% progress
+    console.log('Scroll progress:', progress.toFixed(3), 'Direction:', scrollDirection, 'Infoboxes found:', document.querySelectorAll('.infobox').length);
+  }
     
-    // Process each infobox object - bidirectional system
-    infoboxObjects.forEach((infobox) => {
-      const element = document.querySelector(`.infobox-${infobox.id}`);
-      if (element) {
-        // Create a range for each infobox (start to end)
-        const infoboxStart = infobox.trigger;
-        const infoboxEnd = infobox.trigger + 0.03; // 3% range for each infobox - tighter, cleaner
-        const shouldShow = progress >= infoboxStart && progress < infoboxEnd;
-        
-        // Check if infobox state should change
-        const wasVisible = element.style.display === 'block';
-        
-        if (shouldShow && !wasVisible) {
-          const isMobile = window.innerWidth <= 450;
-          
-          if (isMobile) {
-            // Mobile: Position infoboxes inline with the content flow
-            element.style.setProperty('display', 'block', 'important');
-            element.style.setProperty('position', 'relative', 'important');
-            element.style.setProperty('z-index', '1000', 'important');
-            element.style.setProperty('width', '90vw', 'important');
-            element.style.setProperty('max-width', '90vw', 'important');
-            element.style.setProperty('background-color', 'rgba(255, 255, 255, 0.95)', 'important');
-            element.style.setProperty('border', 'none', 'important');
-            element.style.setProperty('backdrop-filter', 'none', 'important');
-            element.style.setProperty('left', '5vw', 'important');
-            element.style.setProperty('top', 'auto', 'important');
-            element.style.setProperty('margin-bottom', '20px', 'important');
-          } else {
-            // Desktop: Show and position the infobox
-            element.style.setProperty('display', 'block', 'important');
-            element.style.setProperty('position', 'fixed', 'important');
-            element.style.setProperty('z-index', '1000', 'important');
-            element.style.setProperty('max-width', '70vw', 'important');
-            element.style.setProperty('width', '70vw', 'important');
-            element.style.setProperty('background-color', 'transparent', 'important');
-            element.style.setProperty('background', 'transparent', 'important');
-            element.style.setProperty('border-radius', '0', 'important');
-            element.style.setProperty('box-shadow', 'none', 'important');
-            element.style.setProperty('border', 'none', 'important');
-            element.style.setProperty('backdrop-filter', 'none', 'important');
-            
-            // Position relative to the viewport - better positioning
-            const xPosition = window.innerWidth * 0.15; // 15% from left edge for better readability
-            const yPosition = window.innerHeight * 0.2; // 20% from top, responsive to screen height
-            
-            element.style.setProperty('left', `${xPosition}px`, 'important');
-            element.style.setProperty('top', `${yPosition}px`, 'important');
-          }
-          
-          // Create and show visual block if this infobox has block data
-          if (infobox.blockValue) {
-            console.log('Should create block for infobox', infobox.id, 'with value', infobox.blockValue);
-            createVisualBlock(infobox);
-          }
-        } else if (!shouldShow && wasVisible) {
-          // Hide infobox when outside its range
-          element.style.setProperty('display', 'none', 'important');
-          
-          // Hide visual block if this infobox has block data
-          if (infobox.blockValue) {
-            hideVisualBlock(infobox.id);
-          }
+  // Get all dynamically created infoboxes
+  const infoboxElements = document.querySelectorAll('.infobox');
+  
+  // Track which infobox should be visible to implement fallback clearing
+  let infoboxToShow = null;
+  let infoboxToShowId = null;
+  
+  // First pass: determine which infobox should be visible
+  infoboxElements.forEach((element) => {
+    const infoboxId = element.getAttribute('data-infobox-id');
+    const infoboxTrigger = parseFloat(element.getAttribute('data-trigger'));
+    
+    if (infoboxId && !isNaN(infoboxTrigger)) {
+      const infoboxStart = infoboxTrigger - 0.005;
+      const infoboxEnd = infoboxTrigger + 0.035;
+      
+      // Handle both forward and backward scrolling
+      let shouldShow = false;
+      
+      if (scrollDirection === 'forward') {
+        // Forward scrolling: show when entering the trigger range
+        shouldShow = progress >= infoboxStart && progress < infoboxEnd;
+      } else {
+        // Backward scrolling: show when entering the trigger range from the end
+        shouldShow = progress <= infoboxEnd && progress > infoboxStart;
+      }
+      
+      if (shouldShow) {
+        // If multiple infoboxes should show, prioritize the one closest to current progress
+        if (!infoboxToShow || Math.abs(infoboxTrigger - progress) < Math.abs(parseFloat(infoboxToShow.getAttribute('data-trigger')) - progress)) {
+          infoboxToShow = element;
+          infoboxToShowId = infoboxId;
         }
       }
-    });
+    }
+  });
+  
+  // Second pass: show/hide infoboxes with fallback clearing
+  infoboxElements.forEach((element) => {
+    const infoboxId = element.getAttribute('data-infobox-id');
+    const infoboxTrigger = parseFloat(element.getAttribute('data-trigger'));
+    
+    // Debug: Log infobox processing
+    if (progress % 0.1 < 0.01) {
+      console.log('Processing infobox:', infoboxId, 'trigger:', infoboxTrigger, 'progress:', progress.toFixed(3));
+    }
+    
+    if (infoboxId && !isNaN(infoboxTrigger)) {
+      const infoboxStart = infoboxTrigger - 0.005;
+      const infoboxEnd = infoboxTrigger + 0.035;
+      
+      // Handle both forward and backward scrolling
+      let shouldShow = false;
+      
+      if (scrollDirection === 'forward') {
+        // Forward scrolling: show when entering the trigger range
+        shouldShow = progress >= infoboxStart && progress < infoboxEnd;
+      } else {
+        // Backward scrolling: show when entering the trigger range from the end
+        shouldShow = progress <= infoboxEnd && progress > infoboxStart;
+      }
+      
+      const wasVisible = element.classList.contains('visible');
+      
+      // FALLBACK: Force clear all other infoboxes when a new one should appear
+      if (shouldShow && infoboxId === infoboxToShowId && !wasVisible) {
+        // Clear all other visible infoboxes first
+        infoboxElements.forEach((otherElement) => {
+          if (otherElement !== element && otherElement.classList.contains('visible')) {
+            const otherId = otherElement.getAttribute('data-infobox-id');
+            const otherBlockValue = otherElement.getAttribute('data-block-value');
+            
+            // Force hide other infobox
+            otherElement.classList.remove('visible');
+            otherElement.classList.add('hidden');
+            
+            // Force hide other visual block
+            if (otherBlockValue) {
+              hideVisualBlock(otherId);
+            }
+          }
+        });
+        
+        const isMobile = window.innerWidth <= 450;
+        
+        if (isMobile) {
+          // Mobile: Position infoboxes inline with the content flow
+          element.style.setProperty('position', 'relative', 'important');
+          element.style.setProperty('z-index', '1000', 'important');
+          element.style.setProperty('width', '90vw', 'important');
+          element.style.setProperty('max-width', '90vw', 'important');
+          element.style.setProperty('background-color', 'rgba(255, 255, 255, 0.95)', 'important');
+          element.style.setProperty('border', 'none', 'important');
+          element.style.setProperty('backdrop-filter', 'none', 'important');
+          element.style.setProperty('left', '5vw', 'important');
+          element.style.setProperty('top', 'auto', 'important');
+          element.style.setProperty('margin-bottom', '20px', 'important');
+        } else {
+          // Desktop: Show and position the infobox
+          element.style.setProperty('position', 'fixed', 'important');
+          element.style.setProperty('z-index', '1000', 'important');
+          element.style.setProperty('max-width', '70vw', 'important');
+          element.style.setProperty('width', '70vw', 'important');
+          element.style.setProperty('background-color', 'transparent', 'important');
+          element.style.setProperty('background', 'transparent', 'important');
+          element.style.setProperty('border-radius', '0', 'important');
+          element.style.setProperty('box-shadow', 'none', 'important');
+          element.style.setProperty('border', 'none', 'important');
+          element.style.setProperty('backdrop-filter', 'none', 'important');
+          
+          // Position relative to the viewport - better positioning
+          const xPosition = window.innerWidth * 0.15; // 15% from left edge for better readability
+          const yPosition = window.innerHeight * 0.2; // 20% from top, responsive to screen height
+          
+          element.style.setProperty('left', `${xPosition}px`, 'important');
+          element.style.setProperty('top', `${yPosition}px`, 'important');
+        }
+        
+        // Show infobox with smooth animation
+        element.classList.remove('hidden');
+        element.classList.add('visible');
+        
+        // Create and show visual block if this infobox has block data
+        const blockValue = element.getAttribute('data-block-value');
+        if (blockValue) {
+          const blockData = {
+            id: infoboxId,
+            blockValue: parseFloat(blockValue),
+            blockLabel: element.getAttribute('data-block-label') || 'Block',
+            trigger: infoboxTrigger
+          };
+          createVisualBlock(blockData);
+        }
+      } else if (!shouldShow && wasVisible) {
+        // Hide infobox with smooth animation
+        element.classList.remove('visible');
+        element.classList.add('hidden');
+        
+        // Hide visual block if this infobox has block data
+        const blockValue = element.getAttribute('data-block-value');
+        if (blockValue) {
+          hideVisualBlock(infoboxId);
+        }
+      }
+    }
+  });
 }
 
 // Function to initialize all visual blocks that should be visible based on current scroll position
@@ -874,17 +651,27 @@ function initializeVisibleBlocks() {
   if (!scrollData) return;
   
   const { progress } = scrollData;
-  console.log('Initializing visible blocks for progress:', progress);
   
-  infoboxObjects.forEach((infobox) => {
-    if (infobox.blockValue) {
-      const infoboxStart = infobox.trigger;
-      const infoboxEnd = infobox.trigger + 0.03;
+  // Get all dynamically created infoboxes with block data
+  const infoboxElements = document.querySelectorAll('.infobox[data-block-value]');
+  
+  infoboxElements.forEach((element) => {
+    const infoboxTrigger = parseFloat(element.getAttribute('data-trigger'));
+    const blockValue = element.getAttribute('data-block-value');
+    
+    if (!isNaN(infoboxTrigger) && blockValue) {
+      const infoboxStart = infoboxTrigger - 0.005; // Match the buffer from updateInfoboxFlow
+      const infoboxEnd = infoboxTrigger + 0.035;
       const shouldBeVisible = progress >= infoboxStart && progress < infoboxEnd;
       
       if (shouldBeVisible) {
-        console.log('Initializing block for infobox', infobox.id, 'at progress', progress);
-        createVisualBlock(infobox);
+        const blockData = {
+          id: element.getAttribute('data-infobox-id'),
+          blockValue: parseFloat(blockValue),
+          blockLabel: element.getAttribute('data-block-label') || 'Block',
+          trigger: infoboxTrigger
+        };
+        createVisualBlock(blockData);
       }
     }
   });
@@ -1084,6 +871,11 @@ function createVisualBlock(infobox) {
   // Add to Yale wealth bar
   yaleElement.appendChild(block);
   
+  // Trigger smooth animation after a brief delay
+  setTimeout(() => {
+    block.classList.add('visible');
+  }, 50);
+  
   console.log('Visual block created and added to Yale element', block.id);
   
   // Add hover effect
@@ -1096,11 +888,20 @@ function createVisualBlock(infobox) {
   });
 }
 
-// Function to hide visual blocks
+// Function to hide visual blocks with smooth animation
 function hideVisualBlock(infoboxId) {
   const existingBlock = document.getElementById(`visual-block-${infoboxId}`);
   if (existingBlock) {
-    existingBlock.remove();
+    // Add fade out animation
+    existingBlock.classList.remove('visible');
+    existingBlock.classList.add('hidden');
+    
+    // Remove element after animation completes
+    setTimeout(() => {
+      if (existingBlock.parentNode) {
+        existingBlock.remove();
+      }
+    }, 400); // Match CSS transition duration
   }
 }
 

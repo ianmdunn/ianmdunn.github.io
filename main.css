@@ -13,51 +13,47 @@
   /* Scale: 1 pixel = $1,000 (canonical) */
   --scale-ratio: 1000;
   
-  /* Calculate other wealth boxes relative to Yale area */
-  --yale-area: calc(var(--yale-width) * var(--yale-height));
-  --one-thousand-width: calc(var(--yale-width) * 1000 / 40700000000);
-  --median-wage-width: calc(var(--yale-width) * 72000 / 40700000000);
-  --million-width: calc(var(--yale-width) * 1000000 / 40700000000);
-  --billion-width: calc(var(--yale-width) * 1000000000 / 40700000000);
+  /* Pre-calculated values for better performance */
+  --one-thousand-width: 2.5px;
+  --median-wage-width: 180px;
+  --million-width: 2500px;
+  --billion-width: 2500000px;
   
   /* Infobox spacing */
   --infobox-vertical-spacing: 200px;
   --infobox-section-spacing: 300px;
   
+  /* Pre-calculated block dimensions for better performance */
+  --lifetime-block: 4.78px;
+  --rent-block: 4.68px;
+  --childcare-block: 3.66px;
+  --groceries-block: 2.44px;
+  --transportation-block: 1.83px;
+  --retirement-block: 1.53px;
+  --utilities-block: 1.63px;
+  --annual-total-block: 15.57px;
+  --yale-worker-wage-block: 180px;
+  --yale-schwarzman-block: 1495px;
+  --yale-residential-block: 376px;
+  --yale-science-block: 498px;
+  --yale-campaign-block: 17500px;
+  --yale-worker-bonus-block: 997px;
+  --yale-housing-block: 997px;
+  --yale-childcare-block: 753px;
+  --yale-minimum-wage-block: 4986px;
+  --yale-housing-large-block: 997px;
 
+  /* Pre-calculated bar dimensions */
+  --worker-bonus-bar: 610px;
+  --worker-housing-bar: 610px;
+  --worker-childcare-bar: 458px;
+  --worker-wage-bar: 3053px;
   
-  /* Block dimensions relative to Yale width (percentage of Yale's width) */
-  --lifetime-block: calc(var(--yale-width) * 0.000047);
-  --rent-block: calc(var(--yale-width) * 0.000046);
-  --childcare-block: calc(var(--yale-width) * 0.000036);
-  --groceries-block: calc(var(--yale-width) * 0.000024);
-  --transportation-block: calc(var(--yale-width) * 0.000018);
-  --retirement-block: calc(var(--yale-width) * 0.000015);
-  --utilities-block: calc(var(--yale-width) * 0.000016);
-  --annual-total-block: calc(var(--yale-width) * 0.000153);
-  --yale-worker-wage-block: calc(var(--yale-width) * 0.00177);
-  --yale-schwarzman-block: calc(var(--yale-width) * 0.0147);
-  --yale-residential-block: calc(var(--yale-width) * 0.0037);
-  --yale-science-block: calc(var(--yale-width) * 0.0049);
-  --yale-campaign-block: calc(var(--yale-width) * 0.172);
-  --yale-worker-bonus-block: calc(var(--yale-width) * 0.0098);
-  --yale-housing-block: calc(var(--yale-width) * 0.0098);
-  --yale-childcare-block: calc(var(--yale-width) * 0.0074);
-  --yale-minimum-wage-block: calc(var(--yale-width) * 0.049);
-  --yale-housing-large-block: calc(var(--yale-width) * 0.0098);
-
-  
-  /* Bar dimensions relative to Yale width */
-  --worker-bonus-bar: calc(var(--yale-width) * 0.006);
-  --worker-housing-bar: calc(var(--yale-width) * 0.006);
-  --worker-childcare-bar: calc(var(--yale-width) * 0.0045);
-  --worker-wage-bar: calc(var(--yale-width) * 0.03);
-  
-  /* Growth bar dimensions - following 1 pixel = $1,000 rule */
-  --growth-bar-width: calc(var(--yale-width) * 0.15);
+  /* Growth bar dimensions */
+  --growth-bar-width: 15263px;
   --growth-bar-height: 60px;
-  --growth-wealth-width: calc(var(--yale-width) * 0.2);
-  --growth-wealth-height: var(--yale-height);
+  --growth-wealth-width: 20350px;
+  --growth-wealth-height: 400px;
   
   /* Container height and max block height */
   --yale-container-height: 300px;
@@ -68,10 +64,11 @@
 body, html {
   margin: 0;
   padding: 0;
-  font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: var(--font-family, 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif);
+  font-size: var(--font-size, 16px);
   line-height: 1.6;
-  color: #333;
-  background-color: #ffffff;
+  color: var(--main-text-color, #333);
+  background-color: var(--page-background-color, #ffffff);
   overflow-x: auto;
   overflow-y: auto;
 }
@@ -86,7 +83,7 @@ html,
 
 /* ===== GLOBAL LINK STYLES ===== */
 a {
-  color: #ba0c2f;
+  color: var(--yale-link-color, #99e0fa);
   text-decoration: none;
 }
 
@@ -113,7 +110,7 @@ h1 {
   width: 100%;
   margin-top: 80px;
   margin-bottom: 40px;
-  color: #cf2e2e;
+  color: var(--title-color, #cf2e2e);
   font-weight: 800;
   letter-spacing: -0.02em;
   text-transform: uppercase;
@@ -787,63 +784,147 @@ h1 {
 }
 /* ===== INFOBOX LAYOUT & POSITIONING ===== */
 /* ===== UNIFIED INFOBOX SYSTEM ===== */
-/* Base infobox styles */
+/* Base infobox styles - simplified for dynamic loading */
 .infobox {
-  z-index: 10;
   position: absolute;
-  width: 90vw;
-  max-width: 1000px;
-  margin-bottom: var(--infobox-vertical-spacing);
-  max-height: 300px;
-  padding: 20px;
-  background-color: transparent;
-  border-radius: 0;
-  overflow: hidden;
-  display: none;
-  pointer-events: none;
-  color: white;
-}
-
-/* Default state for all infoboxes - hidden */
-.infobox {
-  display: none;
-}
-
-/* Only show infoboxes within Yale section */
-.yale .infobox {
-  display: none;
-  color: white;
-  border: none;
-  pointer-events: auto;
-}
-
-/* Hide infoboxes outside of Yale section */
-.one-thousand .infobox,
-.median-wage .infobox,
-.million .infobox,
-.billion .infobox {
-  display: none;
-}
-
-/* Infobox positioning will be handled by JavaScript */
-.yale .infobox {
-  position: fixed;
-  display: none;
-  color: white;
-  border: none;
-  pointer-events: auto;
   z-index: 1000;
-  width: 90vw;
-  max-width: 1000px;
-  max-height: 300px;
-  padding: 20px;
-  background-color: transparent;
-  border-radius: 12px;
-  overflow: hidden;
-  backdrop-filter: none;
-  box-shadow: none;
+  color: var(--infobox-text-color, white);
+  background-color: var(--infobox-background-color, transparent);
+  padding: 15px;
+  max-width: 300px;
   font-size: 16px;
   line-height: 1.6;
+  pointer-events: auto;
+  
+  /* Smooth transitions for all properties */
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  visibility: hidden;
+  
+  /* Ensure proper positioning */
+  display: block;
+  box-sizing: border-box;
+  
+  /* Default hidden state */
+  pointer-events: none;
+}
+
+/* Infobox visible state */
+.infobox.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Infobox hidden state */
+.infobox.hidden {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  visibility: hidden;
+}
+
+/* Infobox title styles */
+.infobox .title {
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+/* Infobox content styles */
+.infobox .content {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Visual block styles with smooth transitions */
+.visual-block {
+  position: absolute;
+  z-index: 999;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  opacity: 0;
+  transform: scale(0.8);
+  /* Enhanced styling support */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  /* Let inline styles control these properties */
+}
+
+.visual-block.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.visual-block.hidden {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+/* Enhanced visual block with value display */
+.visual-block.with-value {
+  position: relative;
+}
+
+
+
+.visual-block.with-value::after {
+  content: attr(data-value);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  font-weight: 700;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  z-index: 1001;
+}
+
+/* Visual block with label */
+.visual-block.with-label {
+  position: relative;
+}
+
+.visual-block.with-label::before {
+  content: attr(data-label);
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 600;
+  color: #333;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 2px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1001;
+}
+
+/* Media container styles with smooth transitions */
+.media-container {
+  position: absolute;
+  z-index: 999;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  opacity: 0;
+  transform: translateY(10px) scale(0.95);
+}
+
+.media-container.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 /* Content styling */
@@ -1293,7 +1374,7 @@ h1 {
 .yale .wealth {
   width: var(--yale-width);
   height: var(--yale-height);
-  background-color: #286dc0;
+  background-color: var(--yale-wealth-bar-color, #286dc0);
   border: none;
   position: relative;
   overflow: visible;
@@ -1548,17 +1629,7 @@ h1 {
   border: 3px solid #cf2e2e;
 }
 
-/* Utility class for height-constrained blocks */
-.block-height-constrained {
-  --original-width: var(--block-width, 1%);
-  --original-height: var(--block-height, 1%);
-  --block-area: calc(var(--original-width) * var(--original-height));
-  --constrained-height: min(var(--original-height), 300px);
-  --adjusted-width: calc(var(--block-area) / var(--constrained-height));
-  
-  width: var(--adjusted-width);
-  height: var(--constrained-height);
-}
+
 
 
 /* ===== LINE CHART & ZOOM FUNCTIONALITY ===== */
@@ -2204,22 +2275,15 @@ h1 {
 /* ===== YALE VISUAL BLOCKS ===== */
 .yale-visual-block {
   position: absolute;
-  background-color: #ff6900;
   z-index: 1001;
   pointer-events: auto;
   transition: ease-out 0.3s;
   cursor: pointer;
   /* Position above infoboxes */
   top: 20px;
-  /* Size based on value/1000 - will be set via JavaScript */
-  width: var(--block-size, 20px);
-  height: var(--block-size, 20px);
+  /* Let inline styles control these properties */
   min-width: 6px;
   min-height: 6px;
-  /* Explicitly remove any inherited border styling */
-  border: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
 }
 
 .yale-visual-block:hover {
@@ -2761,7 +2825,7 @@ h1 {
 .configurator-popup {
   position: fixed;
   bottom: 20px;
-  right: 20px;
+  left: 20px;
   z-index: 1000;
   font-family: 'Source Sans Pro', sans-serif;
 }
@@ -2798,7 +2862,7 @@ h1 {
 .configurator-panel {
   position: absolute;
   bottom: 100%;
-  right: 0;
+  left: 0;
   width: 280px;
   background: white;
   border-radius: 8px;

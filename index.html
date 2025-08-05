@@ -11,8 +11,24 @@
   <meta property="og:type" content="website">
   <meta property="og:description" content="Yale University's endowment is enormous. Here we visualize its scale in a unique way.">
   
-  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic,700italic|Raleway:800,300,100,600" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" href="main.css">
+  <!-- Performance optimizations -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  
+  <!-- Optimized font loading with display=swap -->
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic,700italic|Raleway:800,300,100,600&display=swap" rel="stylesheet">
+  
+  <!-- Critical CSS - Load first -->
+  <link rel="stylesheet" href="critical.css">
+  
+  <!-- Main CSS - Load after critical -->
+  <link rel="preload" href="main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="main.css"></noscript>
+  
+  <!-- Preload critical images -->
+  <link rel="preload" href="img/ruler.svg" as="image" type="image/svg+xml">
+  <link rel="preload" href="img/right.svg" as="image" type="image/svg+xml">
 </head>
 <body>
 
@@ -57,7 +73,10 @@
           <h2 class="wealth-title">$40.7 billion (Yale University endowment)</h2>
           <div class="counter" id="yale-counter"></div>
           
-          <!-- Infoboxes will be added here via the configurator -->
+          <!-- Infoboxes will be loaded from configuration file -->
+          <div id="infoboxes-container">
+            <!-- Infoboxes will be dynamically loaded here -->
+          </div>
         </div>
       </div>
 
@@ -102,6 +121,241 @@
     </div>
   </div>
 
-<script type="text/javascript" src="main.js?version=1.10"></script>
+  <script type="text/javascript" src="performance.js"></script>
+  <script type="text/javascript" src="main.js?version=1.10" defer></script>
+  
+  <!-- Configuration Loader Script -->
+  <script>
+    // Load and apply infobox configuration with performance optimizations
+    async function loadInfoboxConfiguration() {
+      try {
+        // Check localStorage first (fastest)
+        const localConfig = localStorage.getItem('yaleEndowmentConfig');
+        if (localConfig) {
+          const config = JSON.parse(localConfig);
+          applyInfoboxConfiguration(config);
+          return;
+        }
+        
+        // Load from file with timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+        
+        const response = await fetch('Config Files/active-config.json', {
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        
+        if (response.ok) {
+          const config = await response.json();
+          applyInfoboxConfiguration(config);
+          
+          // Load dynamic files in parallel
+          Promise.allSettled([
+            loadDynamicCSS(),
+            loadDynamicHTML()
+          ]);
+        }
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          console.error('Error loading configuration:', error);
+        }
+      }
+    }
+    
+    // Load dynamic CSS file
+    async function loadDynamicCSS() {
+      try {
+        const response = await fetch('Config Files/dynamic-css.css');
+        if (response.ok) {
+          const cssContent = await response.text();
+          applyDynamicCSS(cssContent);
+        }
+      } catch (error) {
+        // Silently fail - dynamic CSS is optional
+      }
+    }
+    
+    // Load dynamic HTML file
+    async function loadDynamicHTML() {
+      try {
+        const response = await fetch('Config Files/yale-section.html');
+        if (response.ok) {
+          const htmlContent = await response.text();
+          applyDynamicHTML(htmlContent);
+        }
+      } catch (error) {
+        // Silently fail - dynamic HTML is optional
+      }
+    }
+    
+    // Apply dynamic CSS variables
+    function applyDynamicCSS(cssContent) {
+      // Create a style element and inject the CSS
+      const styleElement = document.createElement('style');
+      styleElement.textContent = cssContent;
+      document.head.appendChild(styleElement);
+    }
+    
+    // Apply dynamic HTML section
+    function applyDynamicHTML(htmlContent) {
+      // Find the Yale section and replace it
+      const yaleSection = document.querySelector('.wealth-wrapper.yale');
+      if (yaleSection) {
+        // Create a temporary div to parse the HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlContent;
+        const newYaleSection = tempDiv.querySelector('.wealth-wrapper.yale');
+        
+        if (newYaleSection) {
+          // Preserve the infoboxes container if it exists
+          const existingContainer = yaleSection.querySelector('#infoboxes-container');
+          if (existingContainer) {
+            const newContainer = newYaleSection.querySelector('#infoboxes-container');
+            if (newContainer) {
+              newContainer.innerHTML = existingContainer.innerHTML;
+            }
+          }
+          
+          // Replace the section
+          yaleSection.outerHTML = newYaleSection.outerHTML;
+        }
+      }
+    }
+    
+    function applyInfoboxConfiguration(config) {
+      const container = document.getElementById('infoboxes-container');
+      if (!container) return;
+      
+      // Clear existing infoboxes
+      container.innerHTML = '';
+      
+      // Apply Yale wealth bar settings if provided
+      if (config.yaleWealthBar) {
+        const yaleElement = document.getElementById('yale');
+        if (yaleElement) {
+          const endowmentValue = config.yaleWealthBar.endowmentValue || 40.7;
+          const titleElement = yaleElement.querySelector('.wealth-title');
+          if (titleElement) {
+            titleElement.textContent = `$${endowmentValue} billion (Yale University endowment)`;
+          }
+        }
+      }
+      
+      // Create and position infoboxes efficiently
+      if (config.infoboxes && Array.isArray(config.infoboxes)) {
+        // Use DocumentFragment for better performance
+        const fragment = document.createDocumentFragment();
+        
+        config.infoboxes.forEach((infobox) => {
+          const infoboxElement = document.createElement('div');
+          infoboxElement.className = `infobox ${infobox.class} infobox-${infobox.type} hidden`;
+          infoboxElement.style.left = `${infobox.position.x}px`;
+          infoboxElement.style.top = `${infobox.position.y}px`;
+          
+          // Add data attributes for JavaScript to access
+          infoboxElement.setAttribute('data-infobox-id', infobox.id);
+          infoboxElement.setAttribute('data-trigger', infobox.timelinePosition / 100); // Convert percentage to decimal
+          
+          // For block type infoboxes, calculate value based on content or use default
+          if (infobox.type === 'block' && infobox.visualBlockProps) {
+            let blockValue = '1000'; // Default value
+            
+            // Try to extract value from content or title
+            if (infobox.content && infobox.content.includes('$')) {
+              const match = infobox.content.match(/\$([\d,]+)/);
+              if (match) {
+                blockValue = match[1].replace(/,/g, '');
+              }
+            } else if (infobox.title && infobox.title.includes('$')) {
+              const match = infobox.title.match(/\$([\d,]+)/);
+              if (match) {
+                blockValue = match[1].replace(/,/g, '');
+              }
+            }
+            
+            infoboxElement.setAttribute('data-block-value', blockValue);
+            infoboxElement.setAttribute('data-block-label', infobox.title || 'Block');
+          }
+          
+          // Create title
+          const titleElement = document.createElement('div');
+          titleElement.className = 'title';
+          titleElement.innerHTML = infobox.title;
+          infoboxElement.appendChild(titleElement);
+          
+          // Create content if it exists
+          if (infobox.content) {
+            const contentElement = document.createElement('div');
+            contentElement.className = 'content';
+            contentElement.innerHTML = infobox.content;
+            infoboxElement.appendChild(contentElement);
+          }
+          
+          // Add visual block for block type
+          if (infobox.type === 'block' && infobox.visualBlockProps) {
+            const visualBlock = document.createElement('div');
+            visualBlock.className = 'visual-block';
+            visualBlock.style.left = `${infobox.position.x}px`;
+            visualBlock.style.top = `${infobox.position.y - infobox.visualBlockProps.height - (infobox.visualBlockProps.padding || 20)}px`;
+            visualBlock.style.width = `${infobox.visualBlockProps.width}px`;
+            visualBlock.style.height = `${infobox.visualBlockProps.height}px`;
+            visualBlock.style.backgroundColor = infobox.visualBlockProps.color;
+            visualBlock.style.borderRadius = `${infobox.visualBlockProps.borderRadius || 0}px`;
+            
+            // Add enhanced features if available
+            if (infobox.visualBlockProps.showValue && infobox.visualBlockProps.value) {
+              visualBlock.classList.add('with-value');
+              visualBlock.setAttribute('data-value', `$${(infobox.visualBlockProps.value / 1000).toFixed(0)}k`);
+            }
+            
+            if (infobox.visualBlockProps.label) {
+              visualBlock.classList.add('with-label');
+              visualBlock.setAttribute('data-label', infobox.visualBlockProps.label);
+            }
+            
+            fragment.appendChild(visualBlock);
+          }
+          
+          // Add media for media type
+          if (infobox.type === 'media' && infobox.mediaProps && infobox.mediaProps.url) {
+            const mediaContainer = document.createElement('div');
+            mediaContainer.className = 'media-container';
+            mediaContainer.style.left = `${infobox.position.x}px`;
+            mediaContainer.style.top = `${infobox.position.y - 80}px`;
+            mediaContainer.style.width = `${infobox.mediaProps.width}px`;
+            mediaContainer.style.height = `${infobox.mediaProps.height}px`;
+            
+            if (infobox.mediaProps.type === 'image') {
+              mediaContainer.innerHTML = `<img src="${infobox.mediaProps.url}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">`;
+            } else if (infobox.mediaProps.type === 'video') {
+              mediaContainer.innerHTML = `<video src="${infobox.mediaProps.url}" controls style="width: 100%; height: 100%; object-fit: cover;"></video>`;
+            } else if (infobox.mediaProps.type === 'iframe') {
+              mediaContainer.innerHTML = `<iframe src="${infobox.mediaProps.url}" style="width: 100%; height: 100%; border: none;"></iframe>`;
+            }
+            
+            fragment.appendChild(mediaContainer);
+          }
+          
+          fragment.appendChild(infoboxElement);
+        });
+        
+        // Append all elements at once
+        container.appendChild(fragment);
+        console.log(`Created ${config.infoboxes.length} infoboxes`);
+      }
+    }
+    
+    // Load configuration when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      const container = document.getElementById('infoboxes-container');
+      if (container) {
+        console.log('Infobox container found, loading configuration...');
+        loadInfoboxConfiguration();
+      } else {
+        console.error('Infobox container not found!');
+      }
+    });
+  </script>
 </body>
 </html>

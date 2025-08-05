@@ -1,0 +1,49 @@
+/* Dynamic CSS Variables for Yale Endowment: $40.7B */
+:root {
+  --yale-width: 101750px;
+  --yale-height: 400px;
+  --yale-area: calc(var(--yale-width) * var(--yale-height));
+  
+  /* Color settings */
+  --yale-wealth-bar-color: #286dc0;
+  --yale-link-color: #ff6900;
+  --page-background-color: #ffffff;
+  --main-text-color: #333333;
+  --title-color: #cf2e2e;
+  --infobox-background-color: #000000;
+  --infobox-text-color: #ffffff;
+  --font-family: Arial, sans-serif;
+  --font-size: 16px;
+  
+  /* Block dimensions relative to Yale width (percentage of Yale's width) */
+  --lifetime-block: calc(var(--yale-width) * 0.004742);
+  --rent-block: calc(var(--yale-width) * 0.000059);
+  --childcare-block: calc(var(--yale-width) * 0.000037);
+  --groceries-block: calc(var(--yale-width) * 0.000025);
+  --transportation-block: calc(var(--yale-width) * 0.000020);
+  --retirement-block: calc(var(--yale-width) * 0.000015);
+  --utilities-block: calc(var(--yale-width) * 0.000012);
+  --annual-total-block: calc(var(--yale-width) * 0.000177);
+  
+  /* Yale-specific blocks */
+  --yale-worker-wage-block: calc(var(--yale-width) * 0.00177);
+  --yale-schwarzman-block: calc(var(--yale-width) * 0.0147);
+  --yale-residential-block: calc(var(--yale-width) * 0.0037);
+  --yale-science-block: calc(var(--yale-width) * 0.0049);
+  --yale-campaign-block: calc(var(--yale-width) * 0.172);
+  --yale-worker-bonus-block: calc(var(--yale-width) * 0.0098);
+  --yale-housing-block: calc(var(--yale-width) * 0.0098);
+  --yale-childcare-block: calc(var(--yale-width) * 0.0074);
+  --yale-minimum-wage-block: calc(var(--yale-width) * 0.049);
+  --yale-housing-large-block: calc(var(--yale-width) * 0.0098);
+  
+  /* Bar dimensions relative to Yale width */
+  --worker-bonus-bar: calc(var(--yale-width) * 0.006);
+  --worker-housing-bar: calc(var(--yale-width) * 0.006);
+  --worker-childcare-bar: calc(var(--yale-width) * 0.0045);
+  --worker-wage-bar: calc(var(--yale-width) * 0.03);
+  
+  /* Growth bar dimensions */
+  --growth-bar-width: calc(var(--yale-width) * 0.15);
+  --growth-wealth-width: calc(var(--yale-width) * 0.2);
+}
